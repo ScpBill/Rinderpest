@@ -11,6 +11,7 @@ def start_bot():
     intents.message_content = True
 
     bot = Bot(Config.CMD_PREFIX, intents=intents)
+    bot.load_extension('bot.loader')
 
     register_all_cogs(bot)
     register_models()
