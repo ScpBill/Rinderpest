@@ -19,7 +19,8 @@ def _valid_extensions(extensions: str) -> list:
         return extensions.split(' ')
 
     else:
-        for extension in ls := extensions.split(' '):
+        ls = extensions.split(' ')
+        for extension in ls:
             assert extension.startswith('cogs.'), 'Invalid argument'
         return ['bot.' + ext for ext in ls]
 

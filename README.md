@@ -1,2 +1,2 @@
-# Rinderpest
-Rǐndẽrpest — bot
+# Rǐndẽrpest
+Discord bot
