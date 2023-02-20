@@ -1,6 +1,6 @@
 import os
 
-os.system('git fetch origin master')
+os.system('git pull origin master')
 
 
 if __name__ == '__main__':
