@@ -21,4 +21,5 @@ if __name__ == '__main__':
         while (msg := input('> ')) != 'exit':
             os.system(msg)
 
+    print('The console is close, starting bot...')
     main()
