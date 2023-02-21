@@ -3,6 +3,7 @@ from nextcord import Interaction
 from git.repo import Repo
 from git.exc import GitError
 import traceback
+import subprocess
 
 
 # todo: OtherCogs
@@ -28,6 +29,18 @@ class __MainOtherCog(Cog):
             await reply.edit(traceback.format_exc())
         else:
             await reply.edit('The git repository has been successfully updated!')
+
+    @Bot.slash_command(Bot(), 'cmd')
+    async def cmd(self, interaction: Interaction, command: str):
+        reply = await interaction.response.send_message(
+            'Please wait...', ephemeral=True
+        )
+        try:
+            output = subprocess.check_output(command.split(' '))
+        except Exception:
+            await reply.edit(traceback.format_exc())
+        else:
+            await reply.edit(output)
 
 
 def register_other_cogs(bot: Bot) -> None:
