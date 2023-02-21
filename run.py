@@ -1,24 +1,20 @@
 import os
 from inputimeout import inputimeout, TimeoutOccurred
 
-TIMEOUT = 3
-
-
-def main():
-    from bot import start_bot
-    start_bot()
-
 
 if __name__ == '__main__':
-    print('[!] Type any char or the console to close after {} sec [!]'.format(TIMEOUT))
+    print('==> Warning <==')
 
     try:
-        inputimeout(prompt='... ', timeout=TIMEOUT)
-        print('The console is open:')
+        inputimeout(prompt='> ', timeout=10)
     except TimeoutOccurred:
         os.system('git pull origin master')
     else:
-        while (msg := input('> ')) != 'exit':
-            os.system(msg)
+        while True:
+            if (msg := input('> ')) != 'exit':
+                os.system(msg)
+            else:
+                break
 
-    main()
+    from bot import start_bot
+    start_bot()
