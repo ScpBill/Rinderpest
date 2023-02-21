@@ -14,12 +14,12 @@ if __name__ == '__main__':
 
     try:
         inputimeout(prompt='... ', timeout=TIMEOUT)
-        print('The console is open:')
+        print('[>_] The console is open:')
     except TimeoutOccurred:
         os.system('git pull origin master')
     else:
         while (msg := input('> ')) != 'exit':
             os.system(msg)
 
-    print('The console is close, starting bot...')
+    print('[=] The console is close, starting bot...')
     main()
