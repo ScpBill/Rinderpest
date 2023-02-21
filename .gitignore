@@ -1,3 +1,4 @@
 /.idea/
 .env
-.gitignore
+.gitconfig
+__pycache__/
