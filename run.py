@@ -16,6 +16,7 @@ if __name__ == '__main__':
         inputimeout(prompt='... ', timeout=TIMEOUT)
         print('[>_] The console is open:')
     except TimeoutOccurred:
+        os.system('git commit -a -m \'1\'')
         os.system('git pull origin master')
     else:
         while (msg := input('> ')) != 'exit':
