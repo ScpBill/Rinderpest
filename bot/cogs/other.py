@@ -36,11 +36,11 @@ class __MainOtherCog(Cog):
             'Please wait...', ephemeral=True
         )
         try:
-            output = subprocess.check_output(command.split(' '))
+            output: bytes = subprocess.check_output(command.split(' '))
         except Exception:
             await reply.edit(traceback.format_exc())
         else:
-            await reply.edit(output)
+            await reply.edit(output.decode('utf-8'))
 
 
 def register_other_cogs(bot: Bot) -> None:
