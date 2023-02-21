@@ -11,7 +11,7 @@ class __MainOtherCog(Cog):
 
     @Cog.listener()
     async def on_ready(self) -> None:
-        print('I am ready!!!')
+        print('[*] Bot is started! [*]')
 
     @Bot.slash_command(Bot(), 'update')
     async def update(self, interaction: Interaction):
