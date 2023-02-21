@@ -2,6 +2,7 @@ from nextcord.ext.commands import Bot, Cog
 from nextcord import Interaction
 from git.repo import Repo
 from git.exc import GitError
+import traceback
 
 
 # todo: OtherCogs
@@ -24,7 +25,7 @@ class __MainOtherCog(Cog):
         try:
             repo.remotes.origin.pull()
         except GitError:
-            await reply.edit('The git repository __has already been updated__ or an unexpected error has occurred.')
+            await reply.edit(traceback.format_exc())
         else:
             await reply.edit('The git repository has been successfully updated!')
 
