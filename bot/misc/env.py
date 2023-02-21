@@ -9,4 +9,4 @@ load_dotenv('./.env')
 
 
 class Env(ABC):
-    TOKEN: Final = os.environ.get('TEST_TOKEN', '0_0')
+    TOKEN: Final = os.environ.get('TOKEN', '0_0')
