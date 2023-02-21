@@ -1,5 +1,8 @@
 from nextcord.ext.commands import Bot, Cog
 from nextcord import Interaction
+
+from bot.misc.config import Config
+
 from git.repo import Repo
 from git.exc import GitError
 import traceback
@@ -18,6 +21,11 @@ class __MainOtherCog(Cog):
 
     @Bot.slash_command(Bot(), 'update')
     async def update(self, interaction: Interaction):
+        # Check on author is me
+        if interaction.user.id != Config.ID_ME:
+            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+            return
+
         reply = await interaction.response.send_message(
             'Please wait...', ephemeral=True
         )
@@ -25,6 +33,7 @@ class __MainOtherCog(Cog):
         repo = Repo('./')
         try:
             repo.remotes.origin.pull()
+            repo.commit()
         except GitError:
             await reply.edit(traceback.format_exc())
         else:
@@ -32,6 +41,11 @@ class __MainOtherCog(Cog):
 
     @Bot.slash_command(Bot(), 'cmd')
     async def cmd(self, interaction: Interaction, command: str):
+        # Check on author is me
+        if interaction.user.id != Config.ID_ME:
+            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+            return
+
         reply = await interaction.response.send_message(
             'Please wait...', ephemeral=True
         )
