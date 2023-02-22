@@ -43,7 +43,7 @@ class __MainOtherCog(Cog):
 
         await reply.edit(
             msg := msg + '\n• Git pull origin finish the code `{}`'.format(
-                code_3 := os.system('git pull origin master')))
+                code_3 := os.system('git pull origin master --no-commit --no-ff')))
 
         # Main result message
         if all(code == 0 for code in (code_1, code_2, code_3)):
