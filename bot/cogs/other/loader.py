@@ -66,7 +66,7 @@ class __LoaderOtherCog(Cog):
                 msg += f'\n• Cog `{data}` has been successfully reload'
                 success += 1
             elif isinstance(data, tuple):
-                msg += f'\n• {data[0]}'
+                msg += '\n• {}'.format(data[0].replace("'", '`'))
                 failed += 1
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
@@ -96,7 +96,7 @@ class __LoaderOtherCog(Cog):
                 msg += f'\n• Cog `{data}` has been successfully load'
                 success += 1
             elif isinstance(data, tuple):
-                msg += f'\n• {data[0]}'
+                msg += '\n• {}'.format(data[0].replace("'", '`'))
                 failed += 1
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
@@ -126,7 +126,7 @@ class __LoaderOtherCog(Cog):
                 msg += f'\n• Cog `{data}` has been successfully unload'
                 success += 1
             elif isinstance(data, tuple):
-                msg += f'\n• {data[0]}'
+                msg += '\n• {}'.format(data[0].replace("'", '`'))
                 failed += 1
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
