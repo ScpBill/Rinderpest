@@ -59,7 +59,7 @@ class __MainOtherCog(Cog):
 
         # Out message
         reply = await interaction.response.send_message(
-            'I'm restarting...', ephemeral=True
+            'I\'m restarting...', ephemeral=True
         )
         os.execv(sys.executable, ['python'] + sys.argv)
 
