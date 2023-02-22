@@ -63,7 +63,7 @@ class __LoaderOtherCog(Cog):
         msg, success, failed = 'Cogs reboot results:', 0, 0
         for data in log:
             if isinstance(data, str):
-                msg += f'\n• Cog {data} has been successfully reload'
+                msg += f'\n• Cog `{data}` has been successfully reload'
                 success += 1
             elif isinstance(data, tuple):
                 msg += f'\n• {data[0]}'
@@ -93,7 +93,7 @@ class __LoaderOtherCog(Cog):
         msg, success, failed = 'Cogs reboot results:', 0, 0
         for data in log:
             if isinstance(data, str):
-                msg += f'\n• Cog {data} has been successfully load'
+                msg += f'\n• Cog `{data}` has been successfully load'
                 success += 1
             elif isinstance(data, tuple):
                 msg += f'\n• {data[0]}'
@@ -123,7 +123,7 @@ class __LoaderOtherCog(Cog):
         msg, success, failed = 'Cogs reboot results:', 0, 0
         for data in log:
             if isinstance(data, str):
-                msg += f'\n• Cog {data} has been successfully unload'
+                msg += f'\n• Cog `{data}` has been successfully unload'
                 success += 1
             elif isinstance(data, tuple):
                 msg += f'\n• {data[0]}'
