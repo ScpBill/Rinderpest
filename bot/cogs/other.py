@@ -3,10 +3,9 @@ from nextcord import Interaction
 
 from bot.misc.config import Config
 
-from git.repo import Repo
-from git.exc import GitError
 import traceback
 import subprocess
+import os
 
 
 # todo: OtherCogs
@@ -29,32 +28,24 @@ class __MainOtherCog(Cog):
         reply = await interaction.response.send_message(
             'Please wait...', ephemeral=True
         )
+        msg, log = 'The progress of reading data from a remote server', []
 
-        repo = Repo('./')
-        try:
-            repo.remotes.origin.pull()
-            repo.commit()
-        except GitError:
-            await reply.edit(traceback.format_exc())
+        await reply.edit(
+            msg := msg + '\n• Git reset finish the code `{}`'.format(
+                code_1 := os.system('git reset --hard')))
+
+        await reply.edit(
+            msg := msg + '\n• Git clean finish the code `{}`'.format(
+                code_2 := os.system('git clean -xdf')))
+
+        await reply.edit(
+            msg := msg + '\n• Git pull origin finish the code `{}`'.format(
+                code_3 := os.system('git pull origin master')))
+
+        if all(code == 0 for code in (code_1, code_2, code_3)):
+            await reply.edit(msg + '\n**The git repository has been successfully updated!**')
         else:
-            await reply.edit('The git repository has been successfully updated!')
-
-    @Bot.slash_command(Bot(), 'cmd')
-    async def cmd(self, interaction: Interaction, command: str):
-        # Check on author is me
-        if interaction.user.id != Config.ID_ME:
-            await interaction.response.send_message('You cannot use this command', ephemeral=True)
-            return
-
-        reply = await interaction.response.send_message(
-            'Please wait...', ephemeral=True
-        )
-        try:
-            output: bytes = subprocess.check_output(command.split(' '))
-        except Exception:
-            await reply.edit(traceback.format_exc())
-        else:
-            await reply.edit(output.decode('utf-8'))
+            await reply.edit(msg + '\n**The git repository update failed**')
 
 
 def register_other_cogs(bot: Bot) -> None:
