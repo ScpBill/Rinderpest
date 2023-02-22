@@ -25,7 +25,7 @@ def _valid_extensions(extensions: str) -> list:
         return ['bot.' + ext for ext in ls]
 
 
-class __MainLoaderCog(Cog):
+class __LoaderOtherCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
@@ -134,4 +134,4 @@ class __MainLoaderCog(Cog):
 
 
 def setup(bot: Bot) -> None:
-    bot.add_cog(__MainLoaderCog(bot))
+    bot.add_cog(__LoaderOtherCog(bot))
