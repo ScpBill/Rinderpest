@@ -12,6 +12,10 @@ class __InfoOtherCog(Cog):
         self.bot = bot
         self.start_time = time()
 
+    @Cog.listener()
+    async def on_ready(self) -> None:
+        self.status_is_online.start()
+
     def display_time(self):
         intervals = (
             ('w', 604800),  # 60 * 60 * 24 * 7
