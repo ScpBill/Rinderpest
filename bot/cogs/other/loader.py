@@ -48,8 +48,8 @@ class __LoaderOtherCog(Cog):
         """Interaction with cogs"""
         pass
 
-    @cogs_command.subcommand(Bot())
-    async def reload(
+    @cogs_command.subcommand(Bot(), name='reload')
+    async def _reload(
             self, ctx: Interaction,
             group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
             cogs: str = ''):
@@ -78,8 +78,8 @@ class __LoaderOtherCog(Cog):
         # Outputs a result by reload
         await reply.edit(msg)
 
-    @cogs_command.subcommand(Bot())
-    async def load(
+    @cogs_command.subcommand(Bot(), name='load')
+    async def _load(
             self, ctx: Interaction,
             group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
             cogs: str = ''):
@@ -108,8 +108,8 @@ class __LoaderOtherCog(Cog):
         # Outputs a result by load
         await reply.edit(msg)
 
-    @cogs_command.subcommand(Bot())
-    async def unload(
+    @cogs_command.subcommand(Bot(), name='unload')
+    async def _unload(
             self, ctx: Interaction,
             group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
             cogs: str = ''):

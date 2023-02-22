@@ -15,7 +15,7 @@ class __ServerOtherCog(Cog):
         self.bot = bot
 
     @Bot.slash_command(Bot(), 'update')
-    async def update(self, interaction: Interaction):
+    async def _update(self, interaction: Interaction):
         """Updating data via a remote git repository"""
         # Check on author is me
         if interaction.user.id != Config.ID_ME:
@@ -44,7 +44,7 @@ class __ServerOtherCog(Cog):
             await reply.edit(msg + '\n**The git repository update failed**')
 
     @Bot.slash_command(Bot(), 'restart')
-    async def restart(self, interaction: Interaction):
+    async def _restart(self, interaction: Interaction):
         """Restarting bot"""
         # Check on author is me
         if interaction.user.id != Config.ID_ME:
