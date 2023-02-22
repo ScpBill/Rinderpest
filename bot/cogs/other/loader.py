@@ -56,7 +56,7 @@ class __LoaderOtherCog(Cog):
             return
 
         # Waiting message
-        reply = await ctx.response.defer(ephemeral=True)
+        reply = await ctx.response.defer(ephemeral=True, with_message=True)
 
         # Logging and Reloading Extension
         log = _manage_cogs(group, cogs, self.bot.reload_extension)
