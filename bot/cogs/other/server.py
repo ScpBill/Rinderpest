@@ -6,6 +6,7 @@ from bot.misc.config import Config
 import os
 import sys
 from subprocess import check_output
+import shlex
 
 
 # todo: OtherCogs
@@ -67,7 +68,7 @@ class __ServerOtherCog(Cog):
         await ctx.response.defer(ephemeral=True, with_message=True)
 
         # Executing a command and getting data
-        output: str = check_output('git ' + args).decode('utf-8')
+        output: str = check_output(shlex.split('git ' + args)).decode('utf-8')
         if len(output) >= 2000:
             output = '```\n{}\n...\n```'.format(output[:1980])
 
