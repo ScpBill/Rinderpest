@@ -1,5 +1,5 @@
 from nextcord.ext.commands import Cog, Bot, ExtensionError
-from nextcord import Interaction, SlashOption
+from nextcord import Interaction, SlashOption, InteractionResponse
 
 from bot.misc.config import Config
 
@@ -56,7 +56,7 @@ class __LoaderOtherCog(Cog):
             return
 
         # Waiting message
-        reply = await ctx.response.defer(ephemeral=True, with_message=True)
+        await ctx.response(ephemeral=True, with_message=True)
 
         # Logging and Reloading Extension
         log = _manage_cogs(group, cogs, self.bot.reload_extension)
@@ -71,7 +71,7 @@ class __LoaderOtherCog(Cog):
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
         # Outputs a result by reload
-        await reply.edit(msg)
+        await ctx.followup.send(msg)
 
     @Bot.slash_command(Bot(), name='load')
     async def _load(
@@ -86,7 +86,7 @@ class __LoaderOtherCog(Cog):
             return
 
         # Waiting message
-        reply = await ctx.response.defer(ephemeral=True)
+        await ctx.response(ephemeral=True, with_message=True)
 
         # Logging and Loading Extension
         log = _manage_cogs(group, cogs, self.bot.load_extension)
@@ -101,7 +101,7 @@ class __LoaderOtherCog(Cog):
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
         # Outputs a result by load
-        await reply.edit(msg)
+        await ctx.followup.send(msg)
 
     @Bot.slash_command(Bot(), name='unload')
     async def _unload(
@@ -116,7 +116,7 @@ class __LoaderOtherCog(Cog):
             return
 
         # Waiting message
-        reply = await ctx.response.defer(ephemeral=True)
+        await ctx.response(ephemeral=True, with_message=True)
 
         # Logging and Unloading Extension
         log = _manage_cogs(group, cogs, self.bot.unload_extension)
@@ -131,7 +131,7 @@ class __LoaderOtherCog(Cog):
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
         # Outputs a result by unload
-        await reply.edit(msg)
+        await ctx.followup.send(msg)
 
 
 def setup(bot: Bot) -> None:
