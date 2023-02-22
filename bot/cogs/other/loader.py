@@ -56,7 +56,7 @@ class __LoaderOtherCog(Cog):
             return
 
         # Waiting message
-        await ctx.response(ephemeral=True, with_message=True)
+        await ctx.response.defer(ephemeral=True, with_message=True)
 
         # Logging and Reloading Extension
         log = _manage_cogs(group, cogs, self.bot.reload_extension)
@@ -86,7 +86,7 @@ class __LoaderOtherCog(Cog):
             return
 
         # Waiting message
-        await ctx.response(ephemeral=True, with_message=True)
+        await ctx.response.defer(ephemeral=True, with_message=True)
 
         # Logging and Loading Extension
         log = _manage_cogs(group, cogs, self.bot.load_extension)
@@ -116,7 +116,7 @@ class __LoaderOtherCog(Cog):
             return
 
         # Waiting message
-        await ctx.response(ephemeral=True, with_message=True)
+        await ctx.response.defer(ephemeral=True, with_message=True)
 
         # Logging and Unloading Extension
         log = _manage_cogs(group, cogs, self.bot.unload_extension)
