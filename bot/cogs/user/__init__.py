@@ -4,7 +4,7 @@ import os
 
 def setup_user_cogs(bot: Bot) -> None:
     """Setup cogs by loading extensions"""
-    extensions: list = os.listdir('bot\\cogs\\user\\')
-    extensions.remove('__init__.py')
+    files: list = os.listdir('bot\\cogs\\user')
+    files.remove('__init__.py')
 
-    bot.load_extensions(extensions)
+    bot.load_extensions([f'bot.cogs.user.' + os.path.splitext(file)[0] for file in files if file.endswith('.py')])
