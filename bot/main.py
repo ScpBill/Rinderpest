@@ -2,7 +2,7 @@ from nextcord import Intents
 from nextcord.ext.commands import Bot
 
 from bot.misc import Env, Config
-from bot.cogs import register_all_cogs
+from bot.cogs import setup_all_cogs
 from bot.database.models import register_models
 
 
@@ -11,9 +11,8 @@ def start_bot():
     intents.message_content = True
 
     bot = Bot(Config.CMD_PREFIX, intents=intents)
-    bot.load_extension('bot.loader')
 
-    register_all_cogs(bot)
+    setup_all_cogs(bot)
     register_models()
 
     bot.run(Env.TOKEN)

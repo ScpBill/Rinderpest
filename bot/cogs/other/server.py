@@ -5,17 +5,14 @@ from bot.misc.config import Config
 
 import os
 import sys
+from subprocess import check_output
 
 
 # todo: OtherCogs
-class __MainOtherCog(Cog):
+class __ServerOtherCog(Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-
-    @Cog.listener()
-    async def on_ready(self) -> None:
-        print('[*] Bot is started! [*]')
 
     @Bot.slash_command(Bot(), 'update')
     async def update(self, interaction: Interaction):
@@ -60,6 +57,27 @@ class __MainOtherCog(Cog):
         )
         os.execv(sys.executable, ['python'] + sys.argv)
 
+    @Bot.slash_command(Bot(), 'git')
+    async def git_cmd(self, interaction: Interaction, args: str):
+        """Executing git commands via the bot command"""
+        # Check on author is me
+        if interaction.user.id != Config.ID_ME:
+            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+            return
 
-def register_other_cogs(bot: Bot) -> None:
-    bot.add_cog(__MainOtherCog(bot))
+        # Waiting message
+        reply = await interaction.response.send_message(
+            'Please wait...', ephemeral=True
+        )
+
+        # Executing a command and getting data
+        output: str = check_output('git ' + args).decode('utf-8')
+        if len(output) >= 2000:
+            output = '```\n{}\n...\n```'.format(output[:1980])
+
+        # Sending result
+        await reply.edit(output)
+
+
+def setup(bot: Bot) -> None:
+    bot.add_cog(__ServerOtherCog(bot))
