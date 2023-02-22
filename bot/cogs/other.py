@@ -6,6 +6,7 @@ from bot.misc.config import Config
 import traceback
 import subprocess
 import os
+import sys
 
 
 # todo: OtherCogs
@@ -47,6 +48,20 @@ class __MainOtherCog(Cog):
         else:
             await reply.edit(msg + '\n**The git repository update failed**')
 
+
+    @Bot.slash_command(Bot(), 'restart')
+    async def restart(self, interaction: Interaction):
+        """Restarting bot"""
+        # Check on author is me
+        if interaction.user.id != Config.ID_ME:
+            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+            return
+
+        # Out message
+        reply = await interaction.response.send_message(
+            'I'm restarting...', ephemeral=True
+        )
+        os.execv(sys.executable, ['python'] + sys.argv)
 
 def register_other_cogs(bot: Bot) -> None:
     bot.add_cog(__MainOtherCog(bot))
