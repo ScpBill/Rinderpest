@@ -18,7 +18,7 @@ if __name__ == '__main__':
     except TimeoutOccurred:
         os.system('git reset --hard')
         os.system('git clean -xdf')
-        os.system('git pull origin master')
+        os.system('git pull origin master --no-commit --no-ff')
     else:
         while (msg := input('> ')) != 'exit':
             os.system(msg)
