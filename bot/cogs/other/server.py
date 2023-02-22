@@ -28,19 +28,19 @@ class __ServerOtherCog(Cog):
         msg, log = 'The progress of reading data from a remote server', []
 
         # Generate commands
-        await ctx.followup.send(
+        reply = await ctx.followup.send(
             msg := msg + '\n• Git reset finish the code `{}`'.format(
                 code_1 := os.system('git reset --hard')))
 
-        await ctx.followup.send(
+        await reply.edit(
             msg := msg + '\n• Git pull finish the code `{}`'.format(
                 code_2 := os.system('git pull origin master --no-commit --no-ff')))
 
         # Main result message
         if all(code == 0 for code in (code_1, code_2)):
-            await ctx.followup.send(msg + '\n**The git repository has been successfully updated!**')
+            await reply.edit(msg + '\n**The git repository has been successfully updated!**')
         else:
-            await ctx.followup.send(msg + '\n**The git repository update failed**')
+            await reply.edit(msg + '\n**The git repository update failed**')
 
     @Bot.slash_command(Bot(), 'restart')
     async def _restart(self, ctx: Interaction):
