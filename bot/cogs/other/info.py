@@ -31,7 +31,7 @@ class __InfoOtherCog(Cog):
             value = seconds // count
             if value:
                 seconds -= value * count
-                result.append("{}{}".format(value, name))
+                result.append("{}{}".format(int(value), name))
         return ' '.join(result)
 
     @loop(seconds=10)
