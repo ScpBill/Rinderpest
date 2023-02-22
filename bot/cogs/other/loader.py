@@ -43,7 +43,7 @@ class __LoaderOtherCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Bot.slash_command(Bot(), name='cogs', guild_ids=Config.ID_GUILD)
+    @Bot.slash_command(Bot(), name='cogs', guild_ids=[Config.ID_GUILD])
     async def cogs_command(self, ctx: Interaction):
         """Interaction with cogs"""
         pass
