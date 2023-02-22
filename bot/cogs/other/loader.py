@@ -12,7 +12,7 @@ def _manage_cogs(path: str, ext: str, method) -> list[tuple, str]:
 
     # Function writing extensions
     def iter_files(directory: str):
-        files: list = os.listdir(os.path.join('bot\\cogs\\', directory))
+        files: list = os.listdir(os.path.join('bot/cogs/', directory))
         files.remove('__init__.py')
         extensions.extend(
             [f'bot.cogs.{directory}.' + os.path.splitext(file)[0] for file in files if file.endswith('.py')])
