@@ -13,5 +13,5 @@ class __MainAdminCog(Cog):
         channel = await guild.create_text_channel('secret')
 
 
-def register_admin_cogs(bot: Bot) -> None:
+def setup(bot: Bot) -> None:
     bot.add_cog(__MainAdminCog(bot))

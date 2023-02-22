@@ -20,5 +20,5 @@ class __MainUserCog(Cog):
         await ctx.reply("Pong!")
 
 
-def setup_user_cogs(bot: Bot) -> None:
+def setup(bot: Bot) -> None:
     bot.add_cog(__MainUserCog(bot))

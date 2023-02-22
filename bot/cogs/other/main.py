@@ -83,5 +83,5 @@ class __MainOtherCog(Cog):
         await reply.edit(output)
 
 
-def register_other_cogs(bot: Bot) -> None:
+def setup(bot: Bot) -> None:
     bot.add_cog(__MainOtherCog(bot))
