@@ -15,60 +15,56 @@ class __ServerOtherCog(Cog):
         self.bot = bot
 
     @Bot.slash_command(Bot(), 'update')
-    async def _update(self, interaction: Interaction):
+    async def _update(self, ctx: Interaction):
         """Updating data via a remote git repository"""
         # Check on author is me
-        if interaction.user.id != Config.ID_ME:
-            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.user.id != Config.ID_ME:
+            await ctx.response.send_message('You cannot use this command', ephemeral=True)
             return
 
         # Waiting message
-        reply = await interaction.response.send_message(
-            'Please wait...', ephemeral=True
-        )
+        await ctx.response.defer(ephemeral=True, with_message=True)
         msg, log = 'The progress of reading data from a remote server', []
 
         # Generate commands
-        await reply.edit(
+        await ctx.followup.send(
             msg := msg + '\n• Git reset finish the code `{}`'.format(
                 code_1 := os.system('git reset --hard')))
 
-        await reply.edit(
+        await ctx.followup.send(
             msg := msg + '\n• Git pull finish the code `{}`'.format(
                 code_2 := os.system('git pull origin master --no-commit --no-ff')))
 
         # Main result message
         if all(code == 0 for code in (code_1, code_2)):
-            await reply.edit(msg + '\n**The git repository has been successfully updated!**')
+            await ctx.followup.send(msg + '\n**The git repository has been successfully updated!**')
         else:
-            await reply.edit(msg + '\n**The git repository update failed**')
+            await ctx.followup.send(msg + '\n**The git repository update failed**')
 
     @Bot.slash_command(Bot(), 'restart')
-    async def _restart(self, interaction: Interaction):
+    async def _restart(self, ctx: Interaction):
         """Restarting bot"""
         # Check on author is me
-        if interaction.user.id != Config.ID_ME:
-            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.user.id != Config.ID_ME:
+            await ctx.response.send_message('You cannot use this command', ephemeral=True)
             return
 
         # Out message
-        await interaction.response.send_message(
+        await ctx.response.send_message(
             'I\'m restarting...', ephemeral=True
         )
         os.execv(sys.executable, ['python'] + sys.argv)
 
     @Bot.slash_command(Bot(), 'git')
-    async def git_cmd(self, interaction: Interaction, args: str):
+    async def git_cmd(self, ctx: Interaction, args: str):
         """Executing git commands via the bot command"""
         # Check on author is me
-        if interaction.user.id != Config.ID_ME:
-            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.user.id != Config.ID_ME:
+            await ctx.response.send_message('You cannot use this command', ephemeral=True)
             return
 
         # Waiting message
-        reply = await interaction.response.send_message(
-            'Please wait...', ephemeral=True
-        )
+        await ctx.response.defer(ephemeral=True, with_message=True)
 
         # Executing a command and getting data
         output: str = check_output('git ' + args).decode('utf-8')
@@ -76,7 +72,7 @@ class __ServerOtherCog(Cog):
             output = '```\n{}\n...\n```'.format(output[:1980])
 
         # Sending result
-        await reply.edit(output)
+        await ctx.followup.send(output)
 
 
 def setup(bot: Bot) -> None:
