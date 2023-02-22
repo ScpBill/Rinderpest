@@ -38,7 +38,7 @@ class __MainOtherCog(Cog):
                 code_1 := os.system('git reset --hard')))
 
         await reply.edit(
-            msg := msg + '\n• Git clean finish the code `{}`'.format(
+            msg := msg + '\n• Git pull finish the code `{}`'.format(
                 code_2 := os.system('git pull origin master --no-commit --no-ff')))
 
         # Main result message
