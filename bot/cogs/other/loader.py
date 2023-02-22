@@ -1,136 +1,142 @@
-from nextcord.ext.commands import Cog, Bot, ExtensionNotLoaded, ExtensionNotFound, NoEntryPointError, ExtensionFailed, \
-    ExtensionAlreadyLoaded, InvalidSetupArguments
-from nextcord import Interaction
+from nextcord.ext.commands import Cog, Bot, ExtensionError
+from nextcord import Interaction, SlashOption
 
 from bot.misc.config import Config
 
 import os
 
 
-def _valid_extensions(extensions: str) -> list:
-    if not extensions:
-        for (dir_path, dir_names, file_names) in os.walk('bot\\cogs'):
+def _manage_cogs(path: str, ext: str, method) -> list[tuple, str]:
+    """Manage cogs"""
+    extensions, log = [], []
 
-            # Add a cog name to the list
-            for name in file_names:
-                if os.path.splitext(name)[1] == '.py':
-                    path: str = dir_path.replace('\\', '.')
-                    extensions += (' ' if extensions else '') + f'{path}.{os.path.splitext(name)[0]}'
-        return extensions.split(' ')
+    # Function writing extensions
+    def iter_files(directory: str):
+        files: list = os.listdir(os.path.join('bot\\cogs', directory))
+        files.remove('__init__.py')
+        extensions.extend(
+            [f'bot.cogs.{directory}.' + os.path.splitext(file)[0] for file in files if file.endswith('.py')])
 
+    # Action according to the data
+    if path == 'all':
+        for path in ('admin', 'user', 'other'):
+            iter_files(path)
     else:
-        ls = extensions.split(' ')
-        for extension in ls:
-            assert extension.startswith('cogs.'), 'Invalid argument'
-        return ['bot.' + ext for ext in ls]
+        if not ext:
+            iter_files(path)
+        else:
+            extensions.append(f'bot.cogs.{path}.{ext}')
+
+    # Action with cogs themselves
+    for cog in extensions:
+        try:
+            method(cog)
+        except ExtensionError as error:
+            log.append(error.args)
+        else:
+            log.append(cog)
+
+    return log
 
 
 class __LoaderOtherCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Bot.slash_command(Bot())
-    async def reload(self, interaction: Interaction, *, cogs: str = ''):
+    @Bot.slash_command(Bot(), name='cogs', guild_ids=Config.ID_GUILD)
+    async def cogs_command(self, ctx: Interaction):
+        """Interaction with cogs"""
+        pass
+
+    @cogs_command.subcommand(Bot())
+    async def reload(
+            self, ctx: Interaction,
+            group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
+            cogs: str = ''):
         """Using for reload the bot cogs. Cogs are separated by space."""
+
         # Check on author is me
-        if interaction.user.id != Config.ID_ME:
-            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.user.id != Config.ID_ME:
+            await ctx.response.send_message('You cannot use this command', ephemeral=True)
             return
 
-        # Logging and Reloading Extension
-        log, success = [], 0
-        for cog in _valid_extensions(cogs):
-            try:
-                self.bot.reload_extension(cog)
-            except ExtensionNotLoaded as exc:
-                log.append(exc.args[0])
-            except ExtensionNotFound as exc:
-                log.append(exc.args[0])
-            except NoEntryPointError as exc:
-                log.append(exc.args[0])
-            except ExtensionFailed as exc:
-                log.append(exc.args[0])
+        # Waiting message
+        reply = await ctx.response.defer(ephemeral=True)
 
-            else:
+        # Logging and Reloading Extension
+        log = _manage_cogs(group, cogs, self.bot.reload_extension)
+        msg, success, failed = 'Cogs reboot results:', 0, 0
+        for data in log:
+            if isinstance(data, str):
+                msg += f'\n• Cog {data} has been successfully reload'
                 success += 1
+            elif isinstance(data, tuple):
+                msg += f'\n• {data[0]}'
+                failed += 1
+        msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
         # Outputs a result by reload
-        await interaction.response.send_message(
-            '**All extensions have been reload successfully**' if not log else
+        await reply.edit(msg)
 
-            '\n'.join(['• ' + err.replace("'", '`') for err in log])
-            + f'\n**Successfully reload {success} extensions**',
+    @cogs_command.subcommand(Bot())
+    async def load(
+            self, ctx: Interaction,
+            group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
+            cogs: str = ''):
+        """Using for load the bot cogs. Cogs are separated by space."""
 
-            ephemeral=True
-        )
-
-    @Bot.slash_command(Bot())
-    async def load(self, interaction: Interaction, *, cogs: str = ''):
-        """Using for reload the bot cogs. Cogs are separated by space."""
         # Check on author is me
-        if interaction.user.id != Config.ID_ME:
-            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.user.id != Config.ID_ME:
+            await ctx.response.send_message('You cannot use this command', ephemeral=True)
             return
 
-        # Logging and Reloading Extension
-        log, success = [], 0
-        for cog in _valid_extensions(cogs):
-            try:
-                self.bot.load_extension(cog)
-            except ExtensionNotFound as exc:
-                log.append(exc.args[0])
-            except ExtensionAlreadyLoaded as exc:
-                log.append(exc.args[0])
-            except NoEntryPointError as exc:
-                log.append(exc.args[0])
-            except ExtensionFailed as exc:
-                log.append(exc.args[0])
-            except InvalidSetupArguments as exc:
-                log.append(exc.args[0])
+        # Waiting message
+        reply = await ctx.response.defer(ephemeral=True)
 
-            else:
+        # Logging and Loading Extension
+        log = _manage_cogs(group, cogs, self.bot.load_extension)
+        msg, success, failed = 'Cogs reboot results:', 0, 0
+        for data in log:
+            if isinstance(data, str):
+                msg += f'\n• Cog {data} has been successfully load'
                 success += 1
+            elif isinstance(data, tuple):
+                msg += f'\n• {data[0]}'
+                failed += 1
+        msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
-        # Outputs a result by reload
-        await interaction.response.send_message(
-            '**All extensions have been load successfully**' if not log else
+        # Outputs a result by load
+        await reply.edit(msg)
 
-            '\n'.join(['• ' + err.replace("'", '`') for err in log])
-            + f'\n**Successfully load {success} extensions**',
+    @cogs_command.subcommand(Bot())
+    async def unload(
+            self, ctx: Interaction,
+            group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
+            cogs: str = ''):
+        """Using for unload the bot cogs. Cogs are separated by space."""
 
-            ephemeral=True
-        )
-
-    @Bot.slash_command(Bot())
-    async def unload(self, interaction: Interaction, *, cogs: str = ''):
-        """Using for reload the bot cogs. Cogs are separated by space."""
         # Check on author is me
-        if interaction.user.id != Config.ID_ME:
-            await interaction.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.user.id != Config.ID_ME:
+            await ctx.response.send_message('You cannot use this command', ephemeral=True)
             return
 
-        # Logging and Reloading Extension
-        log, success = [], 0
-        for cog in _valid_extensions(cogs):
-            try:
-                self.bot.unload_extension(cog)
-            except ExtensionNotFound as exc:
-                log.append(exc.args[0])
-            except ExtensionNotLoaded as exc:
-                log.append(exc.args[0])
+        # Waiting message
+        reply = await ctx.response.defer(ephemeral=True)
 
-            else:
+        # Logging and Unloading Extension
+        log = _manage_cogs(group, cogs, self.bot.unload_extension)
+        msg, success, failed = 'Cogs reboot results:', 0, 0
+        for data in log:
+            if isinstance(data, str):
+                msg += f'\n• Cog {data} has been successfully unload'
                 success += 1
+            elif isinstance(data, tuple):
+                msg += f'\n• {data[0]}'
+                failed += 1
+        msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
-        # Outputs a result by reload
-        await interaction.response.send_message(
-            '**All extensions have been unload successfully**' if not log else
-
-            '\n'.join(['• ' + err.replace("'", '`') for err in log])
-            + f'\n**Successfully unload {success} extensions**',
-
-            ephemeral=True
-        )
+        # Outputs a result by unload
+        await reply.edit(msg)
 
 
 def setup(bot: Bot) -> None:
