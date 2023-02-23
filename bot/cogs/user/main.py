@@ -11,7 +11,7 @@ class __MainUserCog(Cog):
     @Bot.slash_command(Bot())
     async def ping(self, interaction: Interaction):
         """Simple command that responds with Pong!"""
-        await interaction.response.pong()
+        await interaction.response.send_message('Pong!')
 
 
 def setup(bot: Bot) -> None:
