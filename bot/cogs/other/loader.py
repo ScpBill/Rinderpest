@@ -47,7 +47,7 @@ class __LoaderOtherCog(Cog):
     async def _reload(
             self, ctx: Interaction,
             group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
-            cogs: str = ''):
+            cogs: str = '') -> None:
         """Using for reload the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
@@ -77,7 +77,7 @@ class __LoaderOtherCog(Cog):
     async def _load(
             self, ctx: Interaction,
             group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
-            cogs: str = ''):
+            cogs: str = '') -> None:
         """Using for load the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
@@ -107,7 +107,7 @@ class __LoaderOtherCog(Cog):
     async def _unload(
             self, ctx: Interaction,
             group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
-            cogs: str = ''):
+            cogs: str = '') -> None:
         """Using for unload the bot cogs. Cogs are separated by space."""
 
         # Check on author is me

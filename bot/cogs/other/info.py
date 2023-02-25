@@ -16,7 +16,8 @@ class __InfoOtherCog(Cog):
     async def on_ready(self) -> None:
         self.status_is_online.start()
 
-    def display_time(self):
+    def display_time(self) -> str:
+        """Calculate time"""
         intervals = (
             ('w', 604800),  # 60 * 60 * 24 * 7
             ('d', 86400),  # 60 * 60 * 24
