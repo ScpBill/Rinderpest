@@ -1,4 +1,4 @@
-from nextcord.ext.commands import Bot
+from discord.ext.commands import Bot
 
 from bot.cogs.admin import setup_admin_cogs
 from bot.cogs.other import setup_other_cogs
