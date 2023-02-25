@@ -34,7 +34,7 @@ class __ServerOtherCog(Cog):
 
         await reply.edit(
             msg := msg + '\n• Git pull finish the code `{}`'.format(
-                code_2 := os.system('git pull origin master --no-commit --no-ff')))
+                code_2 := os.system('git pull origin master')))
 
         # Main result message
         if all(code == 0 for code in (code_1, code_2)):
