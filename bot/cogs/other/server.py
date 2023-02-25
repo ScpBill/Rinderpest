@@ -1,5 +1,5 @@
-from nextcord.ext.commands import Bot, Cog
-from nextcord import Interaction
+from discord.ext.commands import Bot, Cog
+from discord import Interaction
 
 from bot.misc.config import Config
 

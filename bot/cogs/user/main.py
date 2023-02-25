@@ -1,5 +1,5 @@
-from nextcord.ext.commands import Cog, Bot
-from nextcord import Interaction
+from discord.ext.commands import Cog, Bot
+from discord import Interaction
 
 
 # todo: UserCogs
