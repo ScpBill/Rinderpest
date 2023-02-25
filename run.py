@@ -17,7 +17,7 @@ if __name__ == '__main__':
         print('[>_] The console is open:')
     except TimeoutOccurred:
         os.system('git reset --hard')
-        os.system('git pull origin master --no-commit --no-ff')
+        os.system('git pull origin master')
     else:
         while (msg := input('> ')) != 'exit':
             os.system(msg)
