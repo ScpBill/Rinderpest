@@ -1,6 +1,6 @@
-from nextcord.ext.commands import Bot, Cog
-from nextcord.ext.tasks import loop
-from nextcord import Game
+from discord.ext.commands import Bot, Cog
+from discord.ext.tasks import loop
+from discord import Game
 
 from time import time
 

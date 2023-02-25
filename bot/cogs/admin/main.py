@@ -1,4 +1,4 @@
-from nextcord.ext.commands import Cog, Bot, command
+from discord.ext.commands import Cog, Bot, command
 
 
 # todo: AdminCogs

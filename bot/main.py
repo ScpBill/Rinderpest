@@ -1,5 +1,5 @@
-from nextcord import Intents
-from nextcord.ext.commands import Bot
+from discord import Intents
+from discord.ext.commands import Bot
 
 from bot.misc import Env, Config
 from bot.cogs import setup_all_cogs

@@ -1,5 +1,5 @@
-from nextcord.ext.commands import Cog, Bot, ExtensionError
-from nextcord import Interaction, SlashOption, InteractionResponse
+from discord.ext.commands import Cog, Bot, ExtensionError, Context, hybrid_command
+from discord_ui import SlashOption
 
 from bot.misc.config import Config
 
@@ -43,20 +43,20 @@ class __LoaderOtherCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Bot.slash_command(Bot(), name='reload')
+    @hybrid_command(name='reload')
     async def _reload(
-            self, ctx: Interaction,
+            self, ctx: Context,
             group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
             cogs: str = '') -> None:
         """Using for reload the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
-        if ctx.user.id != Config.ID_ME:
-            await ctx.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.message.user.id != Config.ID_ME:
+            await ctx.reply('You cannot use this command', ephemeral=True)
             return
 
         # Waiting message
-        await ctx.response.defer(ephemeral=True, with_message=True)
+        await ctx.defer(ephemeral=True)
 
         # Logging and Reloading Extension
         log = _manage_cogs(group, cogs, self.bot.reload_extension)
@@ -71,11 +71,11 @@ class __LoaderOtherCog(Cog):
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
         # Outputs a result by reload
-        await ctx.followup.send(msg)
+        await ctx.send(msg)
 
-    @Bot.slash_command(Bot(), name='load')
+    @hybrid_command(name='load')
     async def _load(
-            self, ctx: Interaction,
+            self, ctx: Context,
             group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
             cogs: str = '') -> None:
         """Using for load the bot cogs. Cogs are separated by space."""
@@ -103,9 +103,9 @@ class __LoaderOtherCog(Cog):
         # Outputs a result by load
         await ctx.followup.send(msg)
 
-    @Bot.slash_command(Bot(), name='unload')
+    @hybrid_command(name='unload')
     async def _unload(
-            self, ctx: Interaction,
+            self, ctx: Context,
             group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
             cogs: str = '') -> None:
         """Using for unload the bot cogs. Cogs are separated by space."""
