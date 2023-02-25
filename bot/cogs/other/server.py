@@ -5,7 +5,7 @@ from bot.misc.config import Config
 
 import os
 import sys
-from subprocess import check_output
+from subprocess import check_output, CalledProcessError
 import shlex
 
 
@@ -68,12 +68,19 @@ class __ServerOtherCog(Cog):
         await ctx.response.defer(ephemeral=True, with_message=True)
 
         # Executing a command and getting data
-        output: str = check_output(shlex.split('git ' + args)).decode('utf-8')
-        if len(output) >= 2000:
-            output = '```\n{}\n...\n```'.format(output[:1980])
+        try:
+            output: str = check_output(shlex.split('git ' + args)).decode('utf-8')
+        except CalledProcessError as error:
+            output: str = 'Error running command: "{}" see above shell error\nReturn code: {}\n{}'.format(
+                error.cmd, error.returncode, error.output
+            )
+
+        # Cut the output if he is bigger then 2000 chars
+        if len(output) >= 1993:
+            output = '{}\n...'.format(output[:1988])  # [x = len(output)]:  x == 1988 + 4  ==>  x == 1992
 
         # Sending result
-        await ctx.followup.send(output)
+        await ctx.followup.send('```\n{}\n```'.format(output))  # [x = len(output)]:  x <= 1992 + 8  ==>  x <= 2000
 
 
 def setup(bot: Bot) -> None:
