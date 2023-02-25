@@ -8,4 +8,4 @@ def setup_user_cogs(bot: Bot) -> None:
     files.remove('__init__.py')
 
     for ext in [f'bot.cogs.user.' + os.path.splitext(file)[0] for file in files if file.endswith('.py')]:
-        bot.load_extension(ext)
+        await bot.load_extension(ext)
