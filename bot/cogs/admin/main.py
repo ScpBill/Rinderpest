@@ -8,5 +8,5 @@ class __MainAdminCog(Cog):
         self.bot = bot
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(__MainAdminCog(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(__MainAdminCog(bot))

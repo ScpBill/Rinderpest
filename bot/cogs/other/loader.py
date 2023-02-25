@@ -1,12 +1,12 @@
 from discord.ext.commands import Cog, Bot, ExtensionError, Context, hybrid_command
-from discord_ui import SlashOption
+from discord import app_commands
 
 from bot.misc.config import Config
 
 import os
 
 
-def _manage_cogs(path: str, ext: str, method) -> list[tuple, str]:
+async def _manage_cogs(path: str, ext: str, method) -> list[tuple, str]:
     """Manage cogs"""
     extensions, log = [], []
 
@@ -30,7 +30,7 @@ def _manage_cogs(path: str, ext: str, method) -> list[tuple, str]:
     # Action with cogs themselves
     for cog in extensions:
         try:
-            method(cog)
+            await method(cog)
         except ExtensionError as error:
             log.append(error.args)
         else:
@@ -44,14 +44,17 @@ class __LoaderOtherCog(Cog):
         self.bot = bot
 
     @hybrid_command(name='reload')
-    async def _reload(
-            self, ctx: Context,
-            group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
-            cogs: str = '') -> None:
+    @app_commands.choices(group=[
+        app_commands.Choice(name='admin', value='admin'),
+        app_commands.Choice(name='user', value='user'),
+        app_commands.Choice(name='other', value='other'),
+        app_commands.Choice(name='all', value='all')
+    ])
+    async def _reload(self, ctx: Context, group: str, cogs: str = '') -> None:
         """Using for reload the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
-        if ctx.message.user.id != Config.ID_ME:
+        if ctx.message.author.id != Config.ID_ME:
             await ctx.reply('You cannot use this command', ephemeral=True)
             return
 
@@ -59,7 +62,7 @@ class __LoaderOtherCog(Cog):
         await ctx.defer(ephemeral=True)
 
         # Logging and Reloading Extension
-        log = _manage_cogs(group, cogs, self.bot.reload_extension)
+        log = await _manage_cogs(group, cogs, self.bot.reload_extension)
         msg, success, failed = 'Cogs reboot results:', 0, 0
         for data in log:
             if isinstance(data, str):
@@ -71,13 +74,16 @@ class __LoaderOtherCog(Cog):
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
         # Outputs a result by reload
-        await ctx.send(msg)
+        await ctx.reply(msg)
 
     @hybrid_command(name='load')
-    async def _load(
-            self, ctx: Context,
-            group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
-            cogs: str = '') -> None:
+    @app_commands.choices(group=[
+        app_commands.Choice(name='admin', value='admin'),
+        app_commands.Choice(name='user', value='user'),
+        app_commands.Choice(name='other', value='other'),
+        app_commands.Choice(name='all', value='all')
+    ])
+    async def _load(self, ctx: Context, group: str, cogs: str = '') -> None:
         """Using for load the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
@@ -104,10 +110,13 @@ class __LoaderOtherCog(Cog):
         await ctx.followup.send(msg)
 
     @hybrid_command(name='unload')
-    async def _unload(
-            self, ctx: Context,
-            group: str = SlashOption(name='group', choices=['admin', 'user', 'other', 'all']),
-            cogs: str = '') -> None:
+    @app_commands.choices(group=[
+        app_commands.Choice(name='admin', value='admin'),
+        app_commands.Choice(name='user', value='user'),
+        app_commands.Choice(name='other', value='other'),
+        app_commands.Choice(name='all', value='all')
+    ])
+    async def _unload(self, ctx: Context, group: str, cogs: str = '') -> None:
         """Using for unload the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
@@ -134,5 +143,5 @@ class __LoaderOtherCog(Cog):
         await ctx.followup.send(msg)
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(__LoaderOtherCog(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(__LoaderOtherCog(bot))

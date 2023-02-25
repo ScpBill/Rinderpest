@@ -41,5 +41,5 @@ class __InfoOtherCog(Cog):
         await self.bot.change_presence(activity=Game(name='Online is {}'.format(self.display_time())))
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(__InfoOtherCog(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(__InfoOtherCog(bot))

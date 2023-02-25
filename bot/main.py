@@ -1,3 +1,5 @@
+import asyncio
+
 from discord import Intents
 from discord.ext.commands import Bot
 
@@ -12,7 +14,7 @@ def start_bot():
 
     bot = Bot(Config.CMD_PREFIX, intents=intents)
 
-    setup_all_cogs(bot)
+    asyncio.run(setup_all_cogs(bot))
     register_models()
 
     bot.run(Env.TOKEN)

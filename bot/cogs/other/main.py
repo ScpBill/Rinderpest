@@ -12,5 +12,5 @@ class __MainOtherCog(Cog):
         print('[*] Bot is started! [*]')
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(__MainOtherCog(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(__MainOtherCog(bot))

@@ -1,4 +1,4 @@
-from discord.ext.commands import Bot, Cog
+from discord.ext.commands import Bot, Cog, Context, hybrid_command
 from discord import Interaction
 
 from bot.misc.config import Config
@@ -15,7 +15,7 @@ class __ServerOtherCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @Bot.slash_command(Bot(), 'update')
+    @hybrid_command(name='update')
     async def _update(self, ctx: Interaction) -> None:
         """Updating data via a remote git repository"""
         # Check on author is me
@@ -42,7 +42,7 @@ class __ServerOtherCog(Cog):
         else:
             await reply.edit(msg + '\n**The git repository update failed**')
 
-    @Bot.slash_command(Bot(), 'restart')
+    @hybrid_command(name='restart')
     async def _restart(self, ctx: Interaction) -> None:
         """Restarting bot"""
         # Check on author is me
@@ -56,7 +56,7 @@ class __ServerOtherCog(Cog):
         )
         os.execv(sys.executable, ['python'] + sys.argv)
 
-    @Bot.slash_command(Bot(), 'git')
+    @hybrid_command(name='git')
     async def git_cmd(self, ctx: Interaction, args: str) -> None:
         """Executing git commands via the bot command"""
         # Check on author is me
@@ -83,5 +83,5 @@ class __ServerOtherCog(Cog):
         await ctx.followup.send('```\n{}\n```'.format(output))  # [x = len(output)]:  x <= 1992 + 8  ==>  x <= 2000
 
 
-def setup(bot: Bot) -> None:
-    bot.add_cog(__ServerOtherCog(bot))
+async def setup(bot: Bot) -> None:
+    await bot.add_cog(__ServerOtherCog(bot))
