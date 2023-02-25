@@ -1,4 +1,4 @@
-from discord.ext.commands import Cog, Bot, ExtensionError, Context, hybrid_command
+from discord.ext.commands import Cog, Bot, ExtensionError, Context, hybrid_command, hybrid_group
 from discord import app_commands
 
 from bot.misc.config import Config
@@ -43,7 +43,12 @@ class __LoaderOtherCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @hybrid_command(name='reload')
+    @hybrid_group(name='cogs')
+    async def _cogs(self, ctx: Context) -> None:
+        """Manage cogs."""
+        pass
+
+    @_cogs.command(name='reload')
     @app_commands.choices(group=[
         app_commands.Choice(name='admin', value='admin'),
         app_commands.Choice(name='user', value='user'),
@@ -63,7 +68,7 @@ class __LoaderOtherCog(Cog):
 
         # Logging and Reloading Extension
         log = await _manage_cogs(group, cogs, self.bot.reload_extension)
-        msg, success, failed = 'Cogs reboot results:', 0, 0
+        msg, success, failed = '**Result of the command execution:**', 0, 0
         for data in log:
             if isinstance(data, str):
                 msg += f'\n• Cog `{data}` has been successfully reload'
@@ -87,16 +92,16 @@ class __LoaderOtherCog(Cog):
         """Using for load the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
-        if ctx.user.id != Config.ID_ME:
-            await ctx.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.message.author.id != Config.ID_ME:
+            await ctx.reply('You cannot use this command', ephemeral=True)
             return
 
         # Waiting message
-        await ctx.response.defer(ephemeral=True, with_message=True)
+        await ctx.defer(ephemeral=True)
 
         # Logging and Loading Extension
-        log = _manage_cogs(group, cogs, self.bot.load_extension)
-        msg, success, failed = 'Cogs reboot results:', 0, 0
+        log = await _manage_cogs(group, cogs, self.bot.load_extension)
+        msg, success, failed = '**Result of the command execution:**', 0, 0
         for data in log:
             if isinstance(data, str):
                 msg += f'\n• Cog `{data}` has been successfully load'
@@ -107,7 +112,7 @@ class __LoaderOtherCog(Cog):
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
         # Outputs a result by load
-        await ctx.followup.send(msg)
+        await ctx.reply(msg)
 
     @hybrid_command(name='unload')
     @app_commands.choices(group=[
@@ -120,16 +125,16 @@ class __LoaderOtherCog(Cog):
         """Using for unload the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
-        if ctx.user.id != Config.ID_ME:
-            await ctx.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.message.author.id != Config.ID_ME:
+            await ctx.reply('You cannot use this command', ephemeral=True)
             return
 
         # Waiting message
-        await ctx.response.defer(ephemeral=True, with_message=True)
+        await ctx.defer(ephemeral=True)
 
         # Logging and Unloading Extension
-        log = _manage_cogs(group, cogs, self.bot.unload_extension)
-        msg, success, failed = 'Cogs reboot results:', 0, 0
+        log = await _manage_cogs(group, cogs, self.bot.unload_extension)
+        msg, success, failed = '**Result of the command execution:**', 0, 0
         for data in log:
             if isinstance(data, str):
                 msg += f'\n• Cog `{data}` has been successfully unload'
@@ -140,7 +145,7 @@ class __LoaderOtherCog(Cog):
         msg += f'\n`Success: {success}` | `Failed: {failed}`'
 
         # Outputs a result by unload
-        await ctx.followup.send(msg)
+        await ctx.reply(msg)
 
 
 async def setup(bot: Bot) -> None:
