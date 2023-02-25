@@ -2,3 +2,6 @@
 .env
 .gitconfig
 __pycache__/
+/.local/
+/.cache/
+*.pyc
