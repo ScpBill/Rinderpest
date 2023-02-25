@@ -7,11 +7,6 @@ class __MainAdminCog(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @command()
-    async def make_channel(self, ctx):
-        guild = ctx.guild
-        channel = await guild.create_text_channel('secret')
-
 
 def setup(bot: Bot) -> None:
     bot.add_cog(__MainAdminCog(bot))
