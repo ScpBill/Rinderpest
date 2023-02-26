@@ -86,8 +86,8 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
         os.execv(sys.executable, ['python'] + sys.argv)
 
     @commands.hybrid_command(name='git')
-    @app_commands.describe(args='Command Line Arguments')
-    async def git_cmd(self, ctx: Context, args: str) -> None:
+    async def git_cmd(self, ctx: Context,
+                      args: str = commands.parameter(description='Command Line Arguments')) -> None:
         """Executing git commands via the bot command"""
         # Check on author is me
         if ctx.author.id != Config.ID_ME:

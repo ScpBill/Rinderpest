@@ -59,8 +59,9 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
         app_commands.Choice(name='other', value='other'),
         app_commands.Choice(name='all', value='all')
     ])
-    @app_commands.describe(group='Cogs subfolder', cogs='Cogs names')
-    async def _reload(self, ctx: Context, group: str, cogs: str = '') -> None:
+    async def _reload(self, ctx: Context,
+                      group: str = commands.parameter(description='Cogs subfolder'),
+                      cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for reload the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
@@ -93,8 +94,9 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
         app_commands.Choice(name='other', value='other'),
         app_commands.Choice(name='all', value='all')
     ])
-    @app_commands.describe(group='Cogs subfolder', cogs='Cogs names')
-    async def _load(self, ctx: Context, group: str, cogs: str = '') -> None:
+    async def _load(self, ctx: Context,
+                    group: str = commands.parameter(description='Cogs subfolder'),
+                    cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for load the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
@@ -127,8 +129,9 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
         app_commands.Choice(name='other', value='other'),
         app_commands.Choice(name='all', value='all')
     ])
-    @app_commands.describe(group='Cogs subfolder', cogs='Cogs names')
-    async def _unload(self, ctx: Context, group: str, cogs: str = '') -> None:
+    async def _unload(self, ctx: Context,
+                      group: str = commands.parameter(description='Cogs subfolder'),
+                      cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for unload the bot cogs. Cogs are separated by space."""
 
         # Check on author is me
