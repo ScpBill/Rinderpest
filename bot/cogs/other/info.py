@@ -14,7 +14,7 @@ class __InfoOtherCog(Cog):
 
     @Cog.listener()
     async def on_ready(self) -> None:
-        self.status_is_online.start()
+        self.status_by_online.start()
 
     def display_time(self) -> str:
         """Calculate time"""
@@ -36,7 +36,7 @@ class __InfoOtherCog(Cog):
         return ' '.join(result)
 
     @loop(seconds=10)
-    async def status_is_online(self) -> None:
+    async def status_by_online(self) -> None:
         """Show which time left that bot started"""
         await self.bot.change_presence(activity=Game(name='Online is {}'.format(self.display_time())))
 

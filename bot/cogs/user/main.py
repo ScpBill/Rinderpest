@@ -1,5 +1,4 @@
 from discord.ext.commands import Cog, Bot, Context, hybrid_command
-from discord import Interaction
 
 
 # todo: UserCogs
@@ -9,9 +8,9 @@ class __MainUserCog(Cog):
         self.bot = bot
 
     @hybrid_command()
-    async def ping(self, interaction: Interaction) -> None:
+    async def ping(self, ctx: Context) -> None:
         """Simple command that responds with Pong!"""
-        await interaction.response.send_message('Pong!')
+        await ctx.send('Pong!')
 
 
 async def setup(bot: Bot) -> None:

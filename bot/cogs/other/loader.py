@@ -1,4 +1,4 @@
-from discord.ext.commands import Cog, Bot, ExtensionError, Context, hybrid_command, hybrid_group
+from discord.ext.commands import Cog, Bot, ExtensionError, Context, hybrid_group
 from discord import app_commands
 
 from bot.misc.config import Config
@@ -81,7 +81,7 @@ class __LoaderOtherCog(Cog):
         # Outputs a result by reload
         await ctx.reply(msg)
 
-    @hybrid_command(name='load')
+    @_cogs.command(name='load')
     @app_commands.choices(group=[
         app_commands.Choice(name='admin', value='admin'),
         app_commands.Choice(name='user', value='user'),
@@ -114,7 +114,7 @@ class __LoaderOtherCog(Cog):
         # Outputs a result by load
         await ctx.reply(msg)
 
-    @hybrid_command(name='unload')
+    @_cogs.command(name='unload')
     @app_commands.choices(group=[
         app_commands.Choice(name='admin', value='admin'),
         app_commands.Choice(name='user', value='user'),

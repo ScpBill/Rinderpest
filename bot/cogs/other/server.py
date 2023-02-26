@@ -1,5 +1,5 @@
 from discord.ext.commands import Bot, Cog, Context, hybrid_command
-from discord import Interaction, Object
+from discord import Interaction, Object, Message
 from discord.app_commands.models import AppCommand
 
 from bot.misc.config import Config
@@ -41,56 +41,56 @@ class __ServerOtherCog(Cog):
         await ctx.reply(msg)
 
     @hybrid_command(name='update')
-    async def _update(self, ctx: Interaction) -> None:
+    async def _update(self, ctx: Context) -> None:
         """Updating data via a remote git repository"""
         # Check on author is me
-        if ctx.user.id != Config.ID_ME:
-            await ctx.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.author.id != Config.ID_ME:
+            await ctx.send('You cannot use this command', ephemeral=True)
             return
 
         # Waiting message
-        await ctx.response.defer(ephemeral=True, with_message=True)
+        await ctx.defer(ephemeral=True)
         msg, log = 'The progress of reading data from a remote server', []
 
         # Generate commands
-        reply = await ctx.followup.send(
+        reply: Message = await ctx.reply(content=(
             msg := msg + '\n• Git reset finish the code `{}`'.format(
-                code_1 := os.system('git reset --hard')))
+                code_1 := os.system('git reset --hard'))))
 
-        await reply.edit(
+        await reply.edit(content=(
             msg := msg + '\n• Git pull finish the code `{}`'.format(
-                code_2 := os.system('git pull origin master')))
+                code_2 := os.system('git pull origin master'))))
 
         # Main result message
         if all(code == 0 for code in (code_1, code_2)):
-            await reply.edit(msg + '\n**The git repository has been successfully updated!**')
+            await reply.edit(content=(msg + '\n**The git repository has been successfully updated!**'))
         else:
-            await reply.edit(msg + '\n**The git repository update failed**')
+            await reply.edit(content=(msg + '\n**The git repository update failed**'))
 
     @hybrid_command(name='restart')
-    async def _restart(self, ctx: Interaction) -> None:
+    async def _restart(self, ctx: Context) -> None:
         """Restarting bot"""
         # Check on author is me
-        if ctx.user.id != Config.ID_ME:
-            await ctx.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.author.id != Config.ID_ME:
+            await ctx.send('You cannot use this command', ephemeral=True)
             return
 
         # Out message
-        await ctx.response.send_message(
+        await ctx.reply(
             'I\'m restarting...', ephemeral=True
         )
         os.execv(sys.executable, ['python'] + sys.argv)
 
     @hybrid_command(name='git')
-    async def git_cmd(self, ctx: Interaction, args: str) -> None:
+    async def git_cmd(self, ctx: Context, args: str) -> None:
         """Executing git commands via the bot command"""
         # Check on author is me
-        if ctx.user.id != Config.ID_ME:
-            await ctx.response.send_message('You cannot use this command', ephemeral=True)
+        if ctx.author.id != Config.ID_ME:
+            await ctx.send('You cannot use this command', ephemeral=True)
             return
 
         # Waiting message
-        await ctx.response.defer(ephemeral=True, with_message=True)
+        await ctx.defer(ephemeral=True)
 
         # Executing a command and getting data
         try:
@@ -105,7 +105,7 @@ class __ServerOtherCog(Cog):
             output = '{}\n...'.format(output[:1988])  # [x = len(output)]:  x == 1988 + 4  ==>  x == 1992
 
         # Sending result
-        await ctx.followup.send('```\n{}\n```'.format(output))  # [x = len(output)]:  x <= 1992 + 8  ==>  x <= 2000
+        await ctx.reply(content='```\n{}\n```'.format(output))  # [x = len(output)]:  x <= 1992 + 8  ==>  x <= 2000
 
 
 async def setup(bot: Bot) -> None:
