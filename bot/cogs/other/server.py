@@ -1,7 +1,9 @@
 from discord.ext.commands import Bot, Cog, Context, MissingRequiredArgument
 from discord.app_commands.models import AppCommand
 from discord import Object, Message
+
 from discord.ext import commands
+from discord import app_commands
 
 from bot.misc.config import Config
 
@@ -84,6 +86,7 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
         os.execv(sys.executable, ['python'] + sys.argv)
 
     @commands.hybrid_command(name='git')
+    @app_commands.describe(args='Command Line Arguments')
     async def git_cmd(self, ctx: Context, args: str) -> None:
         """Executing git commands via the bot command"""
         # Check on author is me

@@ -22,11 +22,13 @@ async def _manage_cogs(path: str, ext: str, method) -> list[tuple, str]:
     if path == 'all':
         for path in ('admin', 'user', 'other'):
             iter_files(path)
-    else:
+    elif path in ('admin', 'user', 'other'):
         if not ext:
             iter_files(path)
         else:
             extensions.append(f'bot.cogs.{path}.{ext}')
+    else:
+        raise MissingRequiredArgument
 
     # Action with cogs themselves
     for cog in extensions:
@@ -47,7 +49,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
 
     @commands.hybrid_group(name='cogs')
     async def _cogs(self, ctx: Context) -> None:
-        """Manage cogs."""
+        """Manage cogs"""
         pass
 
     @_cogs.command(name='reload')
@@ -57,6 +59,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
         app_commands.Choice(name='other', value='other'),
         app_commands.Choice(name='all', value='all')
     ])
+    @app_commands.describe(group='Cogs subfolder', cogs='Cogs names')
     async def _reload(self, ctx: Context, group: str, cogs: str = '') -> None:
         """Using for reload the bot cogs. Cogs are separated by space."""
 
@@ -90,6 +93,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
         app_commands.Choice(name='other', value='other'),
         app_commands.Choice(name='all', value='all')
     ])
+    @app_commands.describe(group='Cogs subfolder', cogs='Cogs names')
     async def _load(self, ctx: Context, group: str, cogs: str = '') -> None:
         """Using for load the bot cogs. Cogs are separated by space."""
 
@@ -123,6 +127,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
         app_commands.Choice(name='other', value='other'),
         app_commands.Choice(name='all', value='all')
     ])
+    @app_commands.describe(group='Cogs subfolder', cogs='Cogs names')
     async def _unload(self, ctx: Context, group: str, cogs: str = '') -> None:
         """Using for unload the bot cogs. Cogs are separated by space."""
 
