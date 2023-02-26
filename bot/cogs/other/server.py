@@ -1,5 +1,6 @@
 from discord.ext.commands import Bot, Cog, Context, hybrid_command
-from discord import Interaction
+from discord import Interaction, Object
+from discord.app_commands.models import AppCommand
 
 from bot.misc.config import Config
 
@@ -14,6 +15,30 @@ class __ServerOtherCog(Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
+        self.guild = Object(id=Config.ID_GUILD)
+
+    @hybrid_command(name='sync')
+    async def _sync(self, ctx: Context) -> None:
+        """Synchronization of slash commands"""
+        # Check on author is me
+        if ctx.author.id != Config.ID_ME:
+            await ctx.send('You cannot use this command', ephemeral=True)
+            return
+
+        # Waiting message
+        await ctx.defer(ephemeral=True)
+
+        # Synchronization
+        self.bot.tree.copy_global_to(guild=self.guild)
+        app_commands: list[AppCommand] = await self.bot.tree.sync(guild=self.guild)
+
+        # Compilation of the result message
+        msg = '**The result of the synchronization command:**\n'
+        msg = msg + '\n'.join(['• The `{}` command has been successfully loaded'.format(
+            command.name) for command in app_commands])
+
+        # Outputs a result by sync
+        await ctx.reply(msg)
 
     @hybrid_command(name='update')
     async def _update(self, ctx: Interaction) -> None:
