@@ -53,11 +53,11 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
             return
 
         # Waiting message
-        await ctx.defer(ephemeral=True)
-        msg, log = 'The progress of reading data from a remote server', []
+        msg, log = 'The progress of reading data from a remote server...', []
+        reply: Message = await ctx.reply(content=msg, ephemeral=True)
 
         # Generate commands
-        reply: Message = await ctx.reply(content=(
+        await reply.edit(content=(
             msg := msg + '\n• Git reset finish the code `{}`'.format(
                 code_1 := os.system('git reset --hard'))))
 
