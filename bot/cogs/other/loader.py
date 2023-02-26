@@ -1,4 +1,5 @@
-from discord.ext.commands import Cog, Bot, ExtensionError, Context, hybrid_group
+from discord.ext.commands import Cog, Bot, ExtensionError, Context, MissingRequiredArgument
+from discord.ext import commands
 from discord import app_commands
 
 from bot.misc.config import Config
@@ -44,7 +45,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @hybrid_group(name='cogs')
+    @commands.hybrid_group(name='cogs')
     async def _cogs(self, ctx: Context) -> None:
         """Manage cogs."""
         pass
@@ -147,6 +148,13 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
 
         # Outputs a result by unload
         await ctx.reply(msg)
+
+    @_reload.error
+    @_load.error
+    @_unload.error
+    async def git_cmd_error(self, ctx: Context, error):
+        if isinstance(error, MissingRequiredArgument):
+            await self.bot.help_command.send_command_help(ctx.command)
 
 
 async def setup(bot: Bot) -> None:

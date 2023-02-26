@@ -1,6 +1,7 @@
-from discord.ext.commands import Bot, Cog, Context, hybrid_command
-from discord import Interaction, Object, Message
+from discord.ext.commands import Bot, Cog, Context, MissingRequiredArgument
 from discord.app_commands.models import AppCommand
+from discord import Object, Message
+from discord.ext import commands
 
 from bot.misc.config import Config
 
@@ -18,7 +19,7 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
         self.bot = bot
         self.guild = Object(id=Config.ID_GUILD)
 
-    @hybrid_command(name='sync')
+    @commands.hybrid_command(name='sync')
     async def _sync(self, ctx: Context) -> None:
         """Synchronization of slash commands"""
         # Check on author is me
@@ -41,7 +42,7 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
         # Outputs a result by sync
         await ctx.reply(msg)
 
-    @hybrid_command(name='update')
+    @commands.hybrid_command(name='update')
     async def _update(self, ctx: Context) -> None:
         """Updating data via a remote git repository"""
         # Check on author is me
@@ -68,7 +69,7 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
         else:
             await reply.edit(content=(msg + '\n**The git repository update failed**'))
 
-    @hybrid_command(name='restart')
+    @commands.hybrid_command(name='restart')
     async def _restart(self, ctx: Context) -> None:
         """Restarting bot"""
         # Check on author is me
@@ -82,7 +83,7 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
         )
         os.execv(sys.executable, ['python'] + sys.argv)
 
-    @hybrid_command(name='git')
+    @commands.hybrid_command(name='git')
     async def git_cmd(self, ctx: Context, args: str) -> None:
         """Executing git commands via the bot command"""
         # Check on author is me
@@ -107,6 +108,11 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
 
         # Sending result
         await ctx.reply(content='```\n{}\n```'.format(output))  # [x = len(output)]:  x <= 1992 + 8  ==>  x <= 2000
+
+    @git_cmd.error
+    async def git_cmd_error(self, ctx: Context, error):
+        if isinstance(error, MissingRequiredArgument):
+            await self.bot.help_command.send_command_help(ctx.command)
 
 
 async def setup(bot: Bot) -> None:
