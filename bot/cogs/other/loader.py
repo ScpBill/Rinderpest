@@ -160,7 +160,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
     @_reload.error
     @_load.error
     @_unload.error
-    async def git_cmd_error(self, ctx: Context, error):
+    async def _extensions_error(self, ctx: Context, error):
         if isinstance(error, MissingRequiredArgument):
             await ctx.send_help(ctx.command)
 

@@ -3,7 +3,6 @@ from discord.app_commands.models import AppCommand
 from discord import Object, Message
 
 from discord.ext import commands
-from discord import app_commands
 
 from bot.misc.config import Config
 
@@ -34,12 +33,12 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
 
         # Synchronization
         self.bot.tree.copy_global_to(guild=self.guild)
-        app_commands: list[AppCommand] = await self.bot.tree.sync(guild=self.guild)
+        success_commands: list[AppCommand] = await self.bot.tree.sync(guild=self.guild)
 
         # Compilation of the result message
         msg = '**The result of the synchronization command:**\n'
         msg = msg + '\n'.join(['• The `{}` command has been successfully loaded'.format(
-            command.name) for command in app_commands])
+            command.name) for command in success_commands])
 
         # Outputs a result by sync
         await ctx.reply(msg)
