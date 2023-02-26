@@ -1,4 +1,5 @@
 import os
+from inputimeout import inputimeout, TimeoutOccurred
 
 TIMEOUT = 3
 
@@ -11,9 +12,15 @@ def main():
 if __name__ == '__main__':
     print('[!] Type any char or the console to close after {} sec [!]'.format(TIMEOUT))
 
-    print('[>_] The console is open:')
-    while (msg := input('> ')) != 'exit':
-        os.system(msg)
+    try:
+        inputimeout(prompt='... ', timeout=TIMEOUT)
+        print('[>_] The console is open:')
+    except TimeoutOccurred:
+        os.system('git reset --hard')
+        os.system('git pull origin master')
+    else:
+        while (msg := input('> ')) != 'exit':
+            os.system(msg)
 
     print('[=] The console is close, starting bot...')
     main()
