@@ -2,7 +2,7 @@ from discord.ext.commands import Cog, Bot, Context, hybrid_command
 
 
 # todo: UserCogs
-class __MainUserCog(Cog):
+class __MainUserCog(Cog, name='General', description='Basic user commands'):
 
     def __init__(self, bot: Bot):
         self.bot = bot

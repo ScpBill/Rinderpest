@@ -2,7 +2,7 @@ from discord.ext.commands import Bot, Cog
 
 
 # todo: OtherCogs
-class __MainOtherCog(Cog):
+class __MainOtherCog(Cog, name='Main', description=''):
 
     def __init__(self, bot: Bot):
         self.bot = bot

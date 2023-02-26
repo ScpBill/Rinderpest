@@ -11,7 +11,8 @@ import shlex
 
 
 # todo: OtherCogs
-class __ServerOtherCog(Cog):
+class __ServerOtherCog(Cog, name='Server manager', description='Managing the work of the bot',
+                       command_attrs=dict(hidden=True)):
 
     def __init__(self, bot: Bot):
         self.bot = bot

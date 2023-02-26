@@ -39,7 +39,8 @@ async def _manage_cogs(path: str, ext: str, method) -> list[tuple, str]:
     return log
 
 
-class __LoaderOtherCog(Cog):
+class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extensions and loading cogs into them',
+                       command_attrs=dict(hidden=True)):
     def __init__(self, bot: Bot):
         self.bot = bot
 

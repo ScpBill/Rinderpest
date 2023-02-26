@@ -6,7 +6,7 @@ from time import time
 
 
 # todo: OtherCogs
-class __InfoOtherCog(Cog):
+class __InfoOtherCog(Cog, name='Information', description=''):
 
     def __init__(self, bot: Bot):
         self.bot = bot
