@@ -1,5 +1,7 @@
-from discord.ext.commands import Bot, HelpCommand, Cog, Group, Command
+from discord.ext.commands import Bot, HelpCommand, Cog, Group, Command, Context
 from discord import Embed, Color
+
+from discord.ext import commands
 
 
 class MainHelpCommand(HelpCommand):
@@ -63,6 +65,10 @@ class SlashHelpCommands(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.bot.help_command = MainHelpCommand()
+
+    @commands.hybrid_command(name='help')
+    async def _help(self, ctx: Context, category: Cog = '', command: Command = ''):
+        await ctx.send_help(command if command else category if category else ...)
 
 
 async def setup(bot: Bot) -> None:
