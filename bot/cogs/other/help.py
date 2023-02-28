@@ -132,7 +132,7 @@ class SlashHelpCommands(Cog):
     @commands.hybrid_command(name='help')
     async def _help(self, ctx: Context, *, command: str = commands.parameter(
                     description='Either name of command/group or name of category', default=None)):
-        """Show the list of all commands and all categories, that not hidden and they description, syntax, arguments"""
+        """Show the list of all commands and all categories and they description, syntax, arguments"""
 
         if command is not None:
             await ctx.send_help(command)
