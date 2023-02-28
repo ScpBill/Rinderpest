@@ -58,5 +58,12 @@ class MainHelpCommand(HelpCommand):
         return f'Command `{string}` not found.'
 
 
+class SlashHelpCommands(Cog):
+
+    def __init__(self, bot: Bot):
+        self.bot = bot
+        self.bot.help_command = MainHelpCommand()
+
+
 async def setup(bot: Bot) -> None:
-    bot.help_command = MainHelpCommand
+    await bot.add_cog(SlashHelpCommands(bot))
