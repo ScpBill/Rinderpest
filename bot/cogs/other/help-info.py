@@ -3,56 +3,118 @@ from discord import Embed, Color
 
 from discord.ext import commands
 
+from bot.misc.config import Config
+
 
 class MainHelpCommand(HelpCommand):
 
-    def get_command_signature(self, command):
-        return '`%s%s %s`' % (self.context.clean_prefix, command.qualified_name, command.signature)
+    def get_command_signature(self, command: Command) -> str:
+        if command.signature:
+            return '`%s%s %s`' % (self.context.clean_prefix, command.qualified_name, command.signature)
+        return '`%s%s`' % (self.context.clean_prefix, command.qualified_name)
+
+    def get_prefix_command(self, command: Command) -> str:
+        return '`%s%s`' % (self.context.clean_prefix, command.qualified_name)
+
+    async def filter_commands(self, list_commands: [list, set], /, *, sort: bool = False, key=None) -> list[Command]:
+
+        show_hidden = self.context.author.id == Config.ID_ME
+        iterator = list_commands if show_hidden else filter(lambda c: not c.hidden, list_commands)
+
+        return sorted(iterator, key=key if key is not None else lambda c: c.name) if sort else list(iterator)
 
     async def send_bot_help(self, mapping, /) -> None:
-        embed = Embed(title="Help", color=Color.light_grey())
+        embed = Embed(
+            title='Help Information',
+            description=
+            '''Type `/help` to view the list of commands.
+Type `/help <category>` to get information on a separate group of commands.
+Type `/help <command>` to get detailed information on the command.''',
+            color=Color.light_grey())
 
-        for cog, commands in mapping.items():
-            filtered = await self.filter_commands(commands, sort=True)
-            command_signatures = [self.get_command_signature(c) for c in filtered]
+        for cog, cmds in mapping.items():
+            filtered = await self.filter_commands(cmds, sort=True)
+            prefix_commands = [self.get_prefix_command(c) for c in filtered]
 
-            if command_signatures:
-                cog_name = getattr(cog, "qualified_name", "No Category")
-                embed.add_field(name=cog_name, value="\n".join(command_signatures), inline=False)
+            if prefix_commands:
+                cog_name = getattr(cog, 'qualified_name', 'No Category')
+                embed.add_field(name=cog_name, value=' '.join(prefix_commands), inline=True)
 
         await self.context.reply(embed=embed)
 
     async def send_cog_help(self, cog: Cog, /) -> None:
-        embed = Embed(title=cog.qualified_name or "No Category", description=cog.description, color=Color.light_grey())
+        embed = Embed(
+            title='Help for "%s" category' % (cog.qualified_name or 'No Category'),
+            description=
+            '''Type `/help` to view the list of commands.
+Type `/help <category>` to get information on a separate group of commands.
+Type `/help <command>` to get detailed information on the command.''',
+            color=Color.light_grey())
+
+        embed.add_field(name='Category description', value=cog.description)
 
         if filtered_commands := await self.filter_commands(cog.get_commands()):
-            for command in filtered_commands:
-                embed.add_field(name=self.get_command_signature(command),
-                                value=command.help or "No Help Message Found... ")
+            command_context = [
+                '%s — %s' % (self.get_prefix_command(c), c.help or 'No help message found...')
+                for c in filtered_commands]
+
+            embed.add_field(name='Available commands', value='\n'.join(command_context), inline=False)
 
         await self.context.reply(embed=embed)
 
     async def send_group_help(self, group: Group, /) -> None:
-        embed = Embed(title=self.get_command_signature(group), description=group.help, color=Color.light_grey())
+        embed = Embed(
+            title='Help for "%s" group' % group.qualified_name,
+            description=
+            '''Type `/help` to view the list of commands.
+Type `/help <category>` to get information on a separate group of commands.
+Type `/help <command>` to get detailed information on the command.''',
+            color=Color.light_grey())
+
+        embed.add_field(name='Group description', value=group.help)
+        embed.add_field(name='Group signature', value=self.get_command_signature(group))
 
         if filtered_commands := await self.filter_commands(group.commands):
-            for command in filtered_commands:
-                embed.add_field(name=self.get_command_signature(command),
-                                value=command.help or "No Help Message Found... ")
+            command_context = [
+                '%s — %s' % ('`{}`'.format(c.qualified_name), c.help or 'No help message found...')
+                for c in filtered_commands]
+
+            embed.add_field(name='Commands', value='\n'.join(command_context), inline=False)
 
         await self.context.reply(embed=embed)
 
     async def send_command_help(self, command: Command, /) -> None:
-        embed = Embed(title=self.get_command_signature(command), color=Color.light_grey())
-        if command.help:
-            embed.description = command.help
+        embed = Embed(
+            title='Help for "%s" command' % command.qualified_name,
+            description=
+            '''Type `/help` to view the list of commands.
+Type `/help <category>` to get information on a separate group of commands.
+Type `/help <command>` to get detailed information on the command.''',
+            color=Color.light_grey())
+
+        embed.add_field(name='Command description', value=command.help)
+        embed.add_field(name='Command signature', value=self.get_command_signature(command))
+
+        if params := command.params:
+            param_context = []
+            for name, parameter in params.items():
+                param_context.append('%s — %s' % (name, parameter.description))
+            embed.add_field(name='Attributes', value='\n'.join(param_context), inline=False)
         if alias := command.aliases:
-            embed.add_field(name="Aliases", value=", ".join(alias), inline=False)
+            embed.add_field(name='Aliases', value=', '.join(alias), inline=False)
 
         await self.context.reply(embed=embed)
 
     async def send_error_message(self, error: str, /) -> None:
-        embed = Embed(title="Error", description=error, color=Color.red())
+        embed = Embed(
+            title="Error in help",
+            description=
+            '''Type `/help` to view the list of commands.
+Type `/help <category>` to get information on a separate group of commands.
+Type `/help <command>` to get detailed information on the command.''',
+            color=Color.red())
+
+        embed.add_field(name='Error name', value=error)
 
         await self.context.reply(embed=embed)
 
