@@ -12,35 +12,10 @@ from subprocess import check_output, CalledProcessError
 import shlex
 
 
-# todo: OtherCogs
-class __ServerOtherCog(Cog, name='Server manager', description='Managing the work of the bot'):
+class ServerCog(Cog, name='Server manager', description='Version control of the remote bot'):
 
     def __init__(self, bot: Bot):
         self.bot = bot
-        self.guild = Object(id=Config.ID_GUILD)
-
-    @commands.command(name='sync', hidden=True)
-    async def _sync(self, ctx: Context) -> None:
-        """Synchronization of slash commands"""
-        # Check on author is me
-        if ctx.author.id != Config.ID_ME:
-            await ctx.send('You cannot use this command', ephemeral=True)
-            return
-
-        # Waiting message
-        await ctx.defer(ephemeral=True)
-
-        # Synchronization
-        self.bot.tree.copy_global_to(guild=self.guild)
-        success_commands: list[AppCommand] = await self.bot.tree.sync(guild=self.guild)
-
-        # Compilation of the result message
-        msg = '**The result of the synchronization command:**\n'
-        msg = msg + '\n'.join(['• The `{}` command has been successfully loaded'.format(
-            command.name) for command in success_commands])
-
-        # Outputs a result by sync
-        await ctx.reply(msg)
 
     @commands.command(name='update', hidden=True)
     async def _update(self, ctx: Context) -> None:
@@ -116,5 +91,36 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
             await ctx.send_help(ctx.command)
 
 
+class ApplicationCog(Cog, name='Bot Manager', description='Managing the work of the bot'):
+
+    def __init__(self, bot: Bot):
+        self.bot = bot
+        self.guild = Object(id=Config.ID_GUILD)
+
+    @commands.command(name='sync', hidden=True)
+    async def _sync(self, ctx: Context) -> None:
+        """Synchronization of slash commands"""
+        # Check on author is me
+        if ctx.author.id != Config.ID_ME:
+            await ctx.send('You cannot use this command', ephemeral=True)
+            return
+
+        # Waiting message
+        await ctx.defer(ephemeral=True)
+
+        # Synchronization
+        self.bot.tree.copy_global_to(guild=self.guild)
+        success_commands: list[AppCommand] = await self.bot.tree.sync(guild=self.guild)
+
+        # Compilation of the result message
+        msg = '**The result of the synchronization command:**\n'
+        msg = msg + '\n'.join(['• The `{}` command has been successfully loaded'.format(
+            command.name) for command in success_commands])
+
+        # Outputs a result by sync
+        await ctx.reply(msg)
+
+
 async def setup(bot: Bot) -> None:
-    await bot.add_cog(__ServerOtherCog(bot))
+    await bot.add_cog(ServerCog(bot))
+    await bot.add_cog(ApplicationCog(bot))

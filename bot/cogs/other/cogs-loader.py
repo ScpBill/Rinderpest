@@ -41,7 +41,7 @@ async def _manage_cogs(path: str, ext: str, method) -> list[tuple, str]:
     return log
 
 
-class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extensions and loading cogs into them'):
+class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and loading cogs into them'):
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -53,7 +53,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
 
     @_cogs.command(name='reload', hidden=True)
     async def _reload(self, ctx: Context,
-                      group: str = commands.parameter(description='Cogs subfolder'),
+                      group: str = commands.parameter(description='Cogs folder'),
                       cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for reload the bot cogs. Cogs are separated by space."""
 
@@ -82,7 +82,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
 
     @_cogs.command(name='load', hidden=True)
     async def _load(self, ctx: Context,
-                    group: str = commands.parameter(description='Cogs subfolder'),
+                    group: str = commands.parameter(description='Cogs folder'),
                     cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for load the bot cogs. Cogs are separated by space."""
 
@@ -111,7 +111,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
 
     @_cogs.command(name='unload', hidden=True)
     async def _unload(self, ctx: Context,
-                      group: str = commands.parameter(description='Cogs subfolder'),
+                      group: str = commands.parameter(description='Cogs folder'),
                       cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for unload the bot cogs. Cogs are separated by space."""
 
@@ -147,4 +147,4 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
 
 
 async def setup(bot: Bot) -> None:
-    await bot.add_cog(__LoaderOtherCog(bot))
+    await bot.add_cog(LoaderCog(bot))
