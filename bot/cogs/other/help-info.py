@@ -127,10 +127,17 @@ class SlashHelpCommands(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.bot.help_command = MainHelpCommand()
+        self.bot.remove_command('help')
 
     @commands.hybrid_command(name='help')
-    async def _help(self, ctx: Context, category: Cog = '', command: Command = ''):
-        await ctx.send_help(command if command else category if category else ...)
+    async def _help(self, ctx: Context, *, command: str = commands.parameter(
+                    description='Either name of command/group or name of category', default=None)):
+        """Show the list of all commands and all categories, that not hidden and they description, syntax, arguments"""
+
+        if command is not None:
+            await ctx.send_help(command)
+        else:
+            await ctx.send_help()
 
 
 async def setup(bot: Bot) -> None:

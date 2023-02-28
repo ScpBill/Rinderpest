@@ -59,7 +59,7 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
         os.execv(sys.executable, ['python'] + sys.argv)
 
     @commands.command(name='git', hidden=True)
-    async def git_cmd(self, ctx: Context,
+    async def git_cmd(self, ctx: Context, *,
                       args: str = commands.parameter(description='Command Line Arguments')) -> None:
         """Executing git commands via the bot command"""
         # Check on author is me
@@ -75,7 +75,7 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
             output: str = check_output(shlex.split('git ' + args)).decode('utf-8')
         except CalledProcessError as error:
             output: str = 'Error running command: "{}" see above shell error\nReturn code: {}\n{}'.format(
-                error.cmd, error.returncode, error.output
+                error.cmd, error.returncode, error.output.decode('utf-8')
             )
 
         # Cut the output if he is bigger then 2000 chars
