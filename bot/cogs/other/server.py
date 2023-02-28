@@ -13,14 +13,13 @@ import shlex
 
 
 # todo: OtherCogs
-class __ServerOtherCog(Cog, name='Server manager', description='Managing the work of the bot',
-                       command_attrs=dict(hidden=True)):
+class __ServerOtherCog(Cog, name='Server manager', description='Managing the work of the bot'):
 
     def __init__(self, bot: Bot):
         self.bot = bot
         self.guild = Object(id=Config.ID_GUILD)
 
-    @commands.hybrid_command(name='sync')
+    @commands.command(name='sync', hidden=True)
     async def _sync(self, ctx: Context) -> None:
         """Synchronization of slash commands"""
         # Check on author is me
@@ -43,7 +42,7 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
         # Outputs a result by sync
         await ctx.reply(msg)
 
-    @commands.hybrid_command(name='update')
+    @commands.command(name='update', hidden=True)
     async def _update(self, ctx: Context) -> None:
         """Updating data via a remote git repository"""
         # Check on author is me
@@ -70,7 +69,7 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
         else:
             await reply.edit(content=(msg + '\n**The git repository update failed**'))
 
-    @commands.hybrid_command(name='restart')
+    @commands.command(name='restart', hidden=True)
     async def _restart(self, ctx: Context) -> None:
         """Restarting bot"""
         # Check on author is me
@@ -84,7 +83,7 @@ class __ServerOtherCog(Cog, name='Server manager', description='Managing the wor
         )
         os.execv(sys.executable, ['python'] + sys.argv)
 
-    @commands.hybrid_command(name='git')
+    @commands.command(name='git', hidden=True)
     async def git_cmd(self, ctx: Context,
                       args: str = commands.parameter(description='Command Line Arguments')) -> None:
         """Executing git commands via the bot command"""

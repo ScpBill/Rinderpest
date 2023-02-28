@@ -1,6 +1,5 @@
 from discord.ext.commands import Cog, Bot, ExtensionError, Context, MissingRequiredArgument
 from discord.ext import commands
-from discord import app_commands
 
 from bot.misc.config import Config
 
@@ -42,23 +41,17 @@ async def _manage_cogs(path: str, ext: str, method) -> list[tuple, str]:
     return log
 
 
-class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extensions and loading cogs into them',
-                       command_attrs=dict(hidden=True)):
+class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extensions and loading cogs into them'):
+
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    @commands.hybrid_group(name='cogs')
+    @commands.group(name='cogs', hidden=True)
     async def _cogs(self, ctx: Context) -> None:
         """Manage cogs"""
         pass
 
-    @_cogs.command(name='reload')
-    @app_commands.choices(group=[
-        app_commands.Choice(name='admin', value='admin'),
-        app_commands.Choice(name='user', value='user'),
-        app_commands.Choice(name='other', value='other'),
-        app_commands.Choice(name='all', value='all')
-    ])
+    @_cogs.command(name='reload', hidden=True)
     async def _reload(self, ctx: Context,
                       group: str = commands.parameter(description='Cogs subfolder'),
                       cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
@@ -87,13 +80,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
         # Outputs a result by reload
         await ctx.reply(msg)
 
-    @_cogs.command(name='load')
-    @app_commands.choices(group=[
-        app_commands.Choice(name='admin', value='admin'),
-        app_commands.Choice(name='user', value='user'),
-        app_commands.Choice(name='other', value='other'),
-        app_commands.Choice(name='all', value='all')
-    ])
+    @_cogs.command(name='load', hidden=True)
     async def _load(self, ctx: Context,
                     group: str = commands.parameter(description='Cogs subfolder'),
                     cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
@@ -122,13 +109,7 @@ class __LoaderOtherCog(Cog, name='Cogs manager', description='Managing extension
         # Outputs a result by load
         await ctx.reply(msg)
 
-    @_cogs.command(name='unload')
-    @app_commands.choices(group=[
-        app_commands.Choice(name='admin', value='admin'),
-        app_commands.Choice(name='user', value='user'),
-        app_commands.Choice(name='other', value='other'),
-        app_commands.Choice(name='all', value='all')
-    ])
+    @_cogs.command(name='unload', hidden=True)
     async def _unload(self, ctx: Context,
                       group: str = commands.parameter(description='Cogs subfolder'),
                       cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
