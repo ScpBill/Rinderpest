@@ -28,8 +28,7 @@ class MainHelpCommand(HelpCommand):
             title='Help Information',
             description=
             '''Type `/help` to view the list of commands.
-Type `/help <category>` to get information on a separate group of commands.
-Type `/help <command>` to get detailed information on the command.''',
+Type `/help <command>` to get detailed information on the command or category.''',
             color=Color.light_grey())
 
         for cog, cmds in mapping.items():
@@ -47,8 +46,7 @@ Type `/help <command>` to get detailed information on the command.''',
             title='Help for "%s" category' % (cog.qualified_name or 'No Category'),
             description=
             '''Type `/help` to view the list of commands.
-Type `/help <category>` to get information on a separate group of commands.
-Type `/help <command>` to get detailed information on the command.''',
+Type `/help <command>` to get detailed information on the command or category.''',
             color=Color.light_grey())
 
         embed.add_field(name='Category description', value=cog.description)
@@ -67,8 +65,7 @@ Type `/help <command>` to get detailed information on the command.''',
             title='Help for "%s" group' % group.qualified_name,
             description=
             '''Type `/help` to view the list of commands.
-Type `/help <category>` to get information on a separate group of commands.
-Type `/help <command>` to get detailed information on the command.''',
+Type `/help <command>` to get detailed information on the command or category.''',
             color=Color.light_grey())
 
         embed.add_field(name='Group description', value=group.help)
@@ -88,8 +85,7 @@ Type `/help <command>` to get detailed information on the command.''',
             title='Help for "%s" command' % command.qualified_name,
             description=
             '''Type `/help` to view the list of commands.
-Type `/help <category>` to get information on a separate group of commands.
-Type `/help <command>` to get detailed information on the command.''',
+Type `/help <command>` to get detailed information on the command or category.''',
             color=Color.light_grey())
 
         embed.add_field(name='Command description', value=command.help)
@@ -110,8 +106,7 @@ Type `/help <command>` to get detailed information on the command.''',
             title="Error in help",
             description=
             '''Type `/help` to view the list of commands.
-Type `/help <category>` to get information on a separate group of commands.
-Type `/help <command>` to get detailed information on the command.''',
+Type `/help <command>` to get detailed information on the command or category.''',
             color=Color.red())
 
         embed.add_field(name='Error name', value=error)
@@ -122,7 +117,7 @@ Type `/help <command>` to get detailed information on the command.''',
         return f'Command `{string}` not found.'
 
 
-class SlashHelpCommands(Cog):
+class SlashHelpCommands(Cog, name='Help Information', description='Get a help about commands'):
 
     def __init__(self, bot: Bot):
         self.bot = bot
