@@ -17,7 +17,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         await ctx.send('Pong!')
 
     @commands.hybrid_command(name='reaction', aliases=('react', 'emoji', 'rs'))
-    async def _reaction(self, ctx: Context, emoji: Emoji, id_message: int = 0):
+    async def _reaction(self, ctx: Context, emoji: Emoji, id_message: str = None):
         """Puts a reaction to the specified message so that after, the author clicks on it"""
 
         def check(this_reaction: Reaction, this_user: Member):
@@ -25,16 +25,17 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
 
         # Waiting message
         await ctx.defer(ephemeral=True)
-        await ctx.message.delete()
+        if not ctx.interaction:
+            await ctx.message.delete()
 
         # Get a current message id
-        if not id_message and ctx.message.reference:
+        if id_message is None and ctx.message.reference:
             id_message = ctx.message.reference.message_id
 
         # And get a current message
         try:
-            assert id_message != 0
-            current_message: Message = await ctx.fetch_message(id_message)
+            assert id_message is not None
+            current_message: Message = await ctx.fetch_message(id_message.__int__())
         except AssertionError:
             current_message: Message = ctx.channel.last_message
         except NotFound:
