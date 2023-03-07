@@ -61,7 +61,8 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         if isinstance(error, MissingRequiredArgument):
             await ctx.send_help(ctx.command)
         elif isinstance(error, EmojiNotFound):
-            await ctx.message.delete()
+            if not ctx.interaction:
+                await ctx.message.delete()
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
         else:
             await self.bot.get_channel(1082725745920589954).send('```\n%s\n```' % error)
