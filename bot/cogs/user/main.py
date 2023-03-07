@@ -1,5 +1,5 @@
 from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
-from discord import Emoji, NotFound, Message, Reaction, Member
+from discord import Emoji, NotFound, Message, Reaction, Member, Forbidden
 from discord.ext import commands
 
 import asyncio
@@ -35,9 +35,9 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # And get a current message
         try:
             assert id_message is not None
-            current_message: Message = await ctx.fetch_message(id_message.__int__())
+            current_message: Message = await ctx.fetch_message(int(id_message))
         except AssertionError:
-            current_message: Message = ctx.channel.last_message
+            current_message: Message = [msg async for msg in ctx.channel.history(limit=1)].pop(0)
         except NotFound:
             await ctx.reply('Did not find the specified message', ephemeral=True, delete_after=10.0)
             return
@@ -49,7 +49,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
 
         # Wait author click on reaction
         try:
-            await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+            await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
             pass
 
@@ -63,6 +63,8 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         elif isinstance(error, EmojiNotFound):
             await ctx.message.delete()
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
+        else:
+            await self.bot.get_channel(1082725745920589954).send('```\n%s\n```' % error)
 
 
 async def setup(bot: Bot) -> None:
