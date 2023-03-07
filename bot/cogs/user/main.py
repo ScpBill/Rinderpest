@@ -16,8 +16,8 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         """Simple command that responds with Pong!"""
         await ctx.send('Pong!')
 
-    @commands.hybrid_command(name='reaction', aliases=('react', 'emoji', 'rs'))
-    async def _reaction(self, ctx: Context, emoji: Emoji, id_message: str = None):
+    @commands.hybrid_command(aliases=('reaction', 'send_emoji', 'rs'))
+    async def send_reaction(self, ctx: Context, emoji: Emoji, id_message: str = None):
         """Puts a reaction to the specified message so that after, the author clicks on it"""
 
         def check(this_reaction: Reaction, this_user: Member):
@@ -56,8 +56,8 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # Remove my self reaction
         await current_message.remove_reaction(emoji, self.bot.user)
 
-    @_reaction.error
-    async def _reaction_error(self, ctx: Context, error):
+    @send_reaction.error
+    async def send_reaction_error(self, ctx: Context, error):
         if isinstance(error, MissingRequiredArgument):
             await ctx.send_help(ctx.command)
         elif isinstance(error, EmojiNotFound):
