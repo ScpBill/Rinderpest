@@ -1,4 +1,4 @@
-from discord.ext.commands import Cog, Bot, Context
+from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
 from discord import Emoji, NotFound, Message, Reaction, Member
 from discord.ext import commands
 
@@ -47,6 +47,14 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
 
         # Remove my self reaction
         await current_message.remove_reaction(emoji, self.bot.user)
+
+    @_reaction.error
+    async def _reaction_error(self, ctx: Context, error):
+        if isinstance(error, MissingRequiredArgument):
+            await ctx.send_help(ctx.command)
+        elif isinstance(error, EmojiNotFound):
+            await ctx.message.delete()
+            await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
 
 
 async def setup(bot: Bot) -> None:
