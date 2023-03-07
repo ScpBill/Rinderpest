@@ -23,6 +23,10 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         def check(this_reaction: Reaction, this_user: Member):
             return this_reaction.message == current_message and this_reaction.emoji == emoji and this_user == ctx.author
 
+        # Waiting message
+        await ctx.defer(ephemeral=True)
+        await ctx.message.delete()
+
         # Get a current message id
         if not id_message and ctx.message.reference:
             id_message = ctx.message.reference.message_id
@@ -32,14 +36,17 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
             assert id_message != 0
             current_message: Message = await ctx.fetch_message(id_message)
         except AssertionError:
-            current_message: Message = [msg async for msg in ctx.channel.history(limit=2, oldest_first=False)].pop(1)
+            current_message: Message = ctx.channel.last_message
         except NotFound:
-            await ctx.reply('Did not find the specified message')
+            await ctx.reply('Did not find the specified message', ephemeral=True, delete_after=10.0)
             return
 
-        # Add reaction and wait user
+        # Add reaction to message
         await current_message.add_reaction(emoji)
-        await ctx.message.delete()
+        if ctx.interaction:
+            await ctx.reply('Emoji successfully added', ephemeral=True)
+
+        # Wait author click on reaction
         try:
             await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
         except asyncio.TimeoutError:
