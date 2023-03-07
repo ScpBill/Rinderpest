@@ -16,7 +16,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         """Simple command that responds with Pong!"""
         await ctx.send('Pong!')
 
-    @commands.hybrid_command(name='reaction', aliases=('reaction', 'react', 'emoji', 'rs'))
+    @commands.hybrid_command(name='reaction', aliases=('react', 'emoji', 'rs'))
     async def _reaction(self, ctx: Context, emoji: Emoji, id_message: int = 0):
         """Puts a reaction to the specified message so that after, the author clicks on it"""
 
