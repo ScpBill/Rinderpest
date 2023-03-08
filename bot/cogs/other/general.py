@@ -5,6 +5,7 @@ from discord import Object, Message
 from discord.ext import commands
 
 from bot.misc.config import Config
+from bot.misc.utils import PagesView
 
 import os
 import sys
@@ -81,9 +82,12 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
         # Cut the output if he is bigger then 2000 chars
         if len(output) >= 1993:
             output = '{}\n...'.format(output[:1988])  # [x = len(output)]:  x == 1988 + 4  ==>  x == 1992
+            await ctx.reply(content='```\n{}\n```'.format(output), view=PagesView(text=output))
 
         # Sending result
-        await ctx.reply(content='```\n{}\n```'.format(output))  # [x = len(output)]:  x <= 1992 + 8  ==>  x <= 2000
+        await ctx.reply(content='```\n{}\n```'.format(output))
+
+        # [x = len(output)]:  x <= 1992 + 8  ==>  x <= 2000
 
     @git_cmd.error
     async def git_cmd_error(self, ctx: Context, error):
