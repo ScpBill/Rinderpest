@@ -1,8 +1,10 @@
 from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
-from discord import Emoji, NotFound, Message, Reaction, Member, Forbidden
+from discord import Emoji, NotFound, Message, Reaction, Member
 from discord.ext import commands
+from discord.utils import get
 
 import asyncio
+import re
 
 
 # todo: UserCogs
@@ -17,8 +19,16 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         await ctx.send('Pong!')
 
     @commands.hybrid_command(aliases=('reaction', 'send_emoji', 'rs'))
-    async def send_reaction(self, ctx: Context, emoji: Emoji, id_message: str = None):
+    async def send_reaction(self, ctx: Context, emoji: Emoji | str, id_message: str = None):
         """Puts a reaction to the specified message so that after, the author clicks on it"""
+
+        if isinstance(emoji, str):
+            if emoji.isnumeric():  # ID
+                emoji = self.bot.get_emoji(int(emoji))
+            elif re.fullmatch(r'(:\w+:)|(<\w*:\w+:\w+>)', emoji):  # :emoji: | <*a:emoji:id>
+                emoji = get(self.bot.emojis, name=emoji)
+            elif isinstance(emoji, str):  # Standard
+                pass
 
         def check(this_reaction: Reaction, this_user: Member):
             return this_reaction.message == current_message and this_reaction.emoji == emoji and this_user == ctx.author
@@ -43,7 +53,13 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
             return
 
         # Add reaction to message
-        await current_message.add_reaction(emoji)
+        try:
+            await current_message.add_reaction(emoji)
+        except NotFound:
+            await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
+        except Exception as error:
+            await self.bot.get_channel(1082725745920589954).send('```\n%s\n```' % error)
+
         if ctx.interaction:
             await ctx.reply('Emoji successfully added', ephemeral=True)
 
