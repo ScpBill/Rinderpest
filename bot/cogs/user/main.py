@@ -1,8 +1,9 @@
 from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
-from discord import Emoji, NotFound, Message, Reaction, Member, Forbidden
+from discord import Emoji, NotFound, Message, Reaction, Member
 from discord.ext import commands
 
 import asyncio
+import sympy
 
 
 # todo: UserCogs
@@ -56,15 +57,34 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # Remove my self reaction
         await current_message.remove_reaction(emoji, self.bot.user)
 
+    @commands.hybrid_command(aliases=('calc', 'math'))
+    async def calculator(self, ctx: Context, *,
+                         expression: str = commands.parameter(description='String with the expression')):
+        """Calculating a mathematical expression"""
+
+        # Wait message
+        await ctx.defer()
+
+        try:
+            result = sympy.parse_expr(expression, evaluate=True, transformations=sympy.parsing.sympy_parser.T)
+        except SyntaxError:
+            result = 'Syntax Error'
+
+        await ctx.reply('**Your expression:**\n```\n%s\n```\n**Result:**\n```\n%s\n```' % (expression, result))
+
     @send_reaction.error
-    async def send_reaction_error(self, ctx: Context, error):
+    @calculator.error
+    async def argument_error(self, ctx: Context, error):
         if isinstance(error, MissingRequiredArgument):
             await ctx.send_help(ctx.command)
-        elif isinstance(error, EmojiNotFound):
+
+    @send_reaction.error
+    async def send_reaction_error(self, ctx: Context, error):
+        if isinstance(error, EmojiNotFound):
             if not ctx.interaction:
                 await ctx.message.delete()
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
-        else:
+        elif not isinstance(error, MissingRequiredArgument):
             await self.bot.get_channel(1082725745920589954).send('```\n%s\n```' % error)
 
 
