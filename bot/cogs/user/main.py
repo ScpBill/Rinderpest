@@ -96,14 +96,14 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
             expr, result = type(error).__name__, type(error).__name__
         else:
             try:
-                result = f'{float(expr.evalf(30)):g}'
+                result = expr.evalf(30)
             except Exception as error:
                 result = type(error).__name__
 
         # Output
         embed = Embed(title='Math Calculator', description='Based on SymPy')
         embed.add_field(name='Your expression:', value='```py\n%s\n```' % expression, inline=False)
-        if str(expr) != result:
+        if expr != result:
             embed.add_field(name='Simplified view:', value='```py\n%s\n```' % expr)
         embed.add_field(name='Result:', value='```py\n%s\n```' % result)
         embed.set_author(name='by %s' % ctx.author.display_name, icon_url=ctx.author.avatar.url)
