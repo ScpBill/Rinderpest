@@ -1,10 +1,11 @@
 from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
-from discord import Emoji, NotFound, Message, Reaction, Member
+from discord import NotFound, Message, Reaction, Member, Embed
 from discord.ext import commands
 from discord.utils import get
 
 import asyncio
 import re
+import sympy
 
 
 # todo: UserCogs
@@ -79,15 +80,52 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # Remove my self reaction
         await current_message.remove_reaction(emoji, self.bot.user)
 
+    @commands.hybrid_command(aliases=('calc', 'math'))
+    async def calculator(self, ctx: Context, *,
+                         expression: str = commands.parameter(description='String with the expression')):
+        """Calculating a mathematical expression"""
+
+        # Wait message
+        await ctx.defer()
+
+        # Expressing
+        try:
+            expr: sympy.Expr | str = sympy.parse_expr(
+                expression, evaluate=True, transformations=sympy.parsing.sympy_parser.standard_transformations)
+        except Exception as error:
+            expr, result = type(error).__name__, type(error).__name__
+        else:
+            try:
+                result = f'{float(expr.evalf(30)):g}'
+            except Exception as error:
+                result = type(error).__name__
+
+        # Output
+        embed = Embed(title='Math Calculator', description='Based on SymPy')
+        embed.add_field(name='Your expression:', value='```py\n%s\n```' % expression, inline=False)
+        if str(expr) != result:
+            embed.add_field(name='Simplified view:', value='```py\n%s\n```' % expr)
+        embed.add_field(name='Result:', value='```py\n%s\n```' % result)
+        embed.set_author(name='by %s' % ctx.author.display_name, icon_url=ctx.author.avatar.url)
+
+        # Send
+        await ctx.send(embed=embed)
+
     @send_reaction.error
-    async def send_reaction_error(self, ctx: Context, error):
+    @calculator.error
+    async def argument_error(self, ctx: Context, error):
         if isinstance(error, MissingRequiredArgument):
             await ctx.send_help(ctx.command)
-        elif isinstance(error, EmojiNotFound):
+        else:
+            await ctx.reply(error)
+
+    @send_reaction.error
+    async def send_reaction_error(self, ctx: Context, error):
+        if isinstance(error, EmojiNotFound):
             if not ctx.interaction:
                 await ctx.message.delete()
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
-        else:
+        elif not isinstance(error, MissingRequiredArgument):
             await self.bot.get_channel(1082725745920589954).send('```\n%s\n```' % error)
 
 
