@@ -58,8 +58,8 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
             await current_message.add_reaction(emoji)
         except NotFound:
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
-        except Exception as error:
-            await self.bot.get_channel(1082725745920589954).send('```\n%s\n```' % error)
+        except TypeError:
+            await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
 
         if ctx.interaction:
             await ctx.reply('Emoji successfully added', ephemeral=True)
