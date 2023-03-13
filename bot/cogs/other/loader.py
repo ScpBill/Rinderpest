@@ -59,11 +59,7 @@ class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and l
 
         # Check on author is me
         if ctx.message.author.id != Config.ID_ME:
-            await ctx.reply('You cannot use this command', ephemeral=True)
             return
-
-        # Waiting message
-        await ctx.defer(ephemeral=True)
 
         # Logging and Reloading Extension
         log = await _manage_cogs(group, cogs, self.bot.reload_extension)
@@ -88,11 +84,7 @@ class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and l
 
         # Check on author is me
         if ctx.message.author.id != Config.ID_ME:
-            await ctx.reply('You cannot use this command', ephemeral=True)
             return
-
-        # Waiting message
-        await ctx.defer(ephemeral=True)
 
         # Logging and Loading Extension
         log = await _manage_cogs(group, cogs, self.bot.load_extension)
@@ -117,11 +109,7 @@ class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and l
 
         # Check on author is me
         if ctx.message.author.id != Config.ID_ME:
-            await ctx.reply('You cannot use this command', ephemeral=True)
             return
-
-        # Waiting message
-        await ctx.defer(ephemeral=True)
 
         # Logging and Unloading Extension
         log = await _manage_cogs(group, cogs, self.bot.unload_extension)

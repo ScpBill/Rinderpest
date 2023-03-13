@@ -23,7 +23,6 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
         """Updating data via a remote git repository"""
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
-            await ctx.send('You cannot use this command', ephemeral=True)
             return
 
         # Waiting message
@@ -50,7 +49,6 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
         """Restarting bot"""
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
-            await ctx.send('You cannot use this command', ephemeral=True)
             return
 
         # Out message
@@ -60,16 +58,12 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
         os.execv(sys.executable, ['python'] + sys.argv)
 
     @commands.command(name='git', hidden=True)
-    async def git_cmd(self, ctx: Context, *,
-                      args: str = commands.parameter(description='Command Line Arguments')) -> None:
+    async def _git_cmd(self, ctx: Context, *,
+                       args: str = commands.parameter(description='Command Line Arguments')) -> None:
         """Executing git commands via the bot command"""
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
-            await ctx.send('You cannot use this command', ephemeral=True)
             return
-
-        # Waiting message
-        await ctx.defer(ephemeral=True)
 
         # Executing a command and getting data
         try:
@@ -81,7 +75,6 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
 
         # Cut the output if he is bigger then 2000 chars
         if len(output) >= 1993:
-
             # [x = len(output)]:  x == 1988 + 4  ==>  x == 1992
             cut_output = '{}\n...'.format(segments_text(output, 1988)[0])
             await ctx.reply(content='```\n{}\n```'.format(cut_output), view=PagesView(text=output))
@@ -91,8 +84,35 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
 
         # [x = len(output)]:  x <= 1992 + 8  ==>  x <= 2000
 
-    @git_cmd.error
-    async def git_cmd_error(self, ctx: Context, error):
+    @commands.command(name='console', hidden=True)
+    async def _console(self, ctx: Context, *,
+                       args: str = commands.parameter(description='Command Line Arguments')) -> None:
+        """Executing console commands via the bot command"""
+        # Check on author is me
+        if ctx.author.id != Config.ID_ME:
+            return
+
+        try:
+            output: str = check_output(shlex.split(args)).decode('utf-8')
+        except CalledProcessError as error:
+            output: str = 'Error running command: "{}" see above shell error\nReturn code: {}\n{}'.format(
+                error.cmd, error.returncode, error.output.decode('utf-8')
+            )
+
+        # Cut the output if he is bigger then 2000 chars
+        if len(output) >= 1993:
+            # [x = len(output)]:  x == 1988 + 4  ==>  x == 1992
+            cut_output = '{}\n...'.format(segments_text(output, 1988)[0])
+            await ctx.reply(content='```\n{}\n```'.format(cut_output), view=PagesView(text=output))
+
+        # Sending result
+        await ctx.reply(content='```\n{}\n```'.format(output))
+
+        # [x = len(output)]:  x <= 1992 + 8  ==>  x <= 2000
+
+    @_git_cmd.error
+    @_console.error
+    async def argument_error(self, ctx: Context, error):
         if isinstance(error, MissingRequiredArgument):
             await ctx.send_help(ctx.command)
 
@@ -108,11 +128,7 @@ class ApplicationCog(Cog, name='Bot Manager', description='Managing the work of 
         """Synchronization of slash commands"""
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
-            await ctx.send('You cannot use this command', ephemeral=True)
             return
-
-        # Waiting message
-        await ctx.defer(ephemeral=True)
 
         # Synchronization
         self.bot.tree.copy_global_to(guild=self.guild)
