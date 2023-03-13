@@ -22,15 +22,6 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
     async def send_reaction(self, ctx: Context, emoji: str, id_message: str = None):
         """Puts a reaction to the specified message so that after, the author clicks on it"""
 
-        if get(self.bot.emojis, name=emoji):  # Emoji
-            emoji = get(self.bot.emojis, name=emoji)
-        elif emoji.isnumeric():  # ID
-            emoji = self.bot.get_emoji(int(emoji))
-        elif re.fullmatch(r'(:\w+:)|(<\w*:\w+:\w+>)', emoji):  # :emoji: | <*a:emoji:id>
-            emoji = get(self.bot.emojis, name=emoji)
-        elif isinstance(emoji, str):  # Standard
-            pass
-
         def check(this_reaction: Reaction, this_user: Member):
             return this_reaction.message == current_message and this_reaction.emoji == emoji and this_user == ctx.author
 
@@ -38,6 +29,19 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         await ctx.defer(ephemeral=True)
         if not ctx.interaction:
             await ctx.message.delete()
+
+        # Getting emoji
+        if get(self.bot.emojis, name=emoji):  # Emoji
+            emoji = get(self.bot.emojis, name=emoji)
+        elif emoji.isnumeric():  # ID
+            emoji = self.bot.get_emoji(int(emoji))
+        elif re.fullmatch(r'(:\w+:)|(<\w*:\w+:\w+>)', emoji):  # :emoji: | <*a:emoji:id>
+            emoji = get(self.bot.emojis, name=emoji.split(':')[1])
+        elif isinstance(emoji, str):  # Standard
+            pass
+        else:
+            await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
+            return
 
         # Get a current message id
         if id_message is None and ctx.message.reference:
@@ -58,8 +62,10 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
             await current_message.add_reaction(emoji)
         except NotFound:
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
+            return
         except TypeError:
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
+            return
 
         if ctx.interaction:
             await ctx.reply('Emoji successfully added', ephemeral=True)
