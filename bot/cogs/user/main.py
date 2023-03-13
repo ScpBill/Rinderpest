@@ -19,16 +19,17 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         await ctx.send('Pong!')
 
     @commands.hybrid_command(aliases=('reaction', 'send_emoji', 'rs'))
-    async def send_reaction(self, ctx: Context, emoji: [Emoji, str], id_message: str = None):
+    async def send_reaction(self, ctx: Context, emoji: str, id_message: str = None):
         """Puts a reaction to the specified message so that after, the author clicks on it"""
 
-        if isinstance(emoji, str):
-            if emoji.isnumeric():  # ID
-                emoji = self.bot.get_emoji(int(emoji))
-            elif re.fullmatch(r'(:\w+:)|(<\w*:\w+:\w+>)', emoji):  # :emoji: | <*a:emoji:id>
-                emoji = get(self.bot.emojis, name=emoji)
-            elif isinstance(emoji, str):  # Standard
-                pass
+        if get(self.bot.emojis, name=emoji):  # Emoji
+            emoji = get(self.bot.emojis, name=emoji)
+        elif emoji.isnumeric():  # ID
+            emoji = self.bot.get_emoji(int(emoji))
+        elif re.fullmatch(r'(:\w+:)|(<\w*:\w+:\w+>)', emoji):  # :emoji: | <*a:emoji:id>
+            emoji = get(self.bot.emojis, name=emoji)
+        elif isinstance(emoji, str):  # Standard
+            pass
 
         def check(this_reaction: Reaction, this_user: Member):
             return this_reaction.message == current_message and this_reaction.emoji == emoji and this_user == ctx.author
