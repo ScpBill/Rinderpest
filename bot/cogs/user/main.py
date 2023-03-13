@@ -1,5 +1,5 @@
 from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
-from discord import Emoji, NotFound, Message, Reaction, Member
+from discord import Emoji, NotFound, Message, Reaction, Member, Embed
 from discord.ext import commands
 
 import asyncio
@@ -65,18 +65,36 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # Wait message
         await ctx.defer()
 
+        # Expressing
         try:
-            result = sympy.parse_expr(expression, evaluate=True, transformations=sympy.parsing.sympy_parser.T)
-        except SyntaxError:
-            result = 'Syntax Error'
+            expr: sympy.Expr | str = sympy.parse_expr(
+                expression, evaluate=True, transformations=sympy.parsing.sympy_parser.standard_transformations)
+        except Exception as error:
+            expr, result = type(error).__name__, type(error).__name__
+        else:
+            try:
+                result = f'{float(expr.evalf(30)):g}'
+            except Exception as error:
+                result = type(error).__name__
 
-        await ctx.reply('**Your expression:**\n```\n%s\n```\n**Result:**\n```\n%s\n```' % (expression, result))
+        # Output
+        embed = Embed(title='Math Calculator', description='Based on SymPy')
+        embed.add_field(name='Your expression:', value='```py\n%s\n```' % expression, inline=False)
+        if str(expr) != result:
+            embed.add_field(name='Simplified view:', value='```py\n%s\n```' % expr)
+        embed.add_field(name='Result:', value='```py\n%s\n```' % result)
+        embed.set_author(name='by %s' % ctx.author.display_name, icon_url=ctx.author.avatar.url)
+
+        # Send
+        await ctx.send(embed=embed)
 
     @send_reaction.error
     @calculator.error
     async def argument_error(self, ctx: Context, error):
         if isinstance(error, MissingRequiredArgument):
             await ctx.send_help(ctx.command)
+        else:
+            await ctx.reply(error)
 
     @send_reaction.error
     async def send_reaction_error(self, ctx: Context, error):
