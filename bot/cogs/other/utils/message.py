@@ -11,6 +11,8 @@ def segments_text(text: str, max_length: int) -> list[str]:
         if len(segments[-1]) + 1 + len(line) <= max_length:
             segments[-1] += '\n%s' % line
         else:
+            if not segments[-1]:
+                segments.pop()
             segments.extend([line[s:s + max_length] for s in range(0, len(line), max_length)])
     return segments
 
