@@ -5,7 +5,6 @@ from discord import Object, Message
 from discord.ext import commands
 
 from bot.misc.config import Config
-from bot.misc.utils import PagesView, segments_text
 
 import os
 import sys
@@ -61,6 +60,8 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
     async def _git_cmd(self, ctx: Context, *,
                        args: str = commands.parameter(description='Command Line Arguments')) -> None:
         """Executing git commands via the bot command"""
+        from bot.misc.utils import PagesView, segments_text
+
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
             return
@@ -88,6 +89,8 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
     async def _console(self, ctx: Context, *,
                        args: str = commands.parameter(description='Command Line Arguments')) -> None:
         """Executing console commands via the bot command"""
+        from bot.misc.utils import PagesView, segments_text
+
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
             return
