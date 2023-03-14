@@ -116,7 +116,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # Output
         embed = Embed(title='Math Calculator', description='Based on SymPy')
         embed.add_field(name='Your expression:', value='```py\n%s\n```' % expression, inline=False)
-        if len(result) > 1:
+        if len(result) > 1 and result[0] != result[1]:
             embed.add_field(name='Simplified view:', value='```py\n%s\n```' % result.pop(0))
         embed.add_field(name='Detailed result:', value='```py\n%s\n```' % result.pop(0))
         embed.set_author(name='by %s' % ctx.author.display_name, icon_url=ctx.author.avatar.url)
