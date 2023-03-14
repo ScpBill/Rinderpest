@@ -132,6 +132,23 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # Send
         await ctx.send(embed=embed)
 
+    @commands.hybrid_command()
+    async def emoji(self, ctx: Context, emoji: str = commands.parameter(description='Emoji')):
+        """Get info about emoji"""
+        from bot.misc.utils import get_emoji
+
+        # Waiting message
+        await ctx.defer(ephemeral=True)
+
+        # Getting emoji
+        emoji = get_emoji(self.bot, emoji)
+        if emoji is None:
+            await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
+            return
+
+        # Message
+        embed = Embed(title=)
+
     @send_reaction.error
     @calculator.error
     async def argument_error(self, ctx: Context, error):
