@@ -1,12 +1,10 @@
 from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
 from discord import NotFound, Message, Reaction, Member, Embed
 from discord.ext import commands
-from discord.utils import get
 
 from bot.misc.utils import segments_text, get_emoji
 
 import asyncio
-import re
 import sympy
 
 
