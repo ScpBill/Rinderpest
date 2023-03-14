@@ -3,7 +3,7 @@ from discord import NotFound, Message, Reaction, Member, Embed
 from discord.ext import commands
 from discord.utils import get
 
-from bot.misc.utils import segments_text
+from bot.misc.utils import segments_text, get_emoji
 
 import asyncio
 import re
@@ -34,15 +34,8 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
             await ctx.message.delete()
 
         # Getting emoji
-        if get(self.bot.emojis, name=emoji):  # Emoji
-            emoji = get(self.bot.emojis, name=emoji)
-        elif emoji.isnumeric():  # ID
-            emoji = self.bot.get_emoji(int(emoji))
-        elif re.fullmatch(r'(:\w+:)|(<\w*:\w+:\w+>)', emoji):  # :emoji: | <*a:emoji:id>
-            emoji = get(self.bot.emojis, name=emoji.split(':')[1])
-        elif isinstance(emoji, str):  # Standard
-            pass
-        else:
+        emoji = get_emoji(self.bot, emoji)
+        if emoji is None:
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
             return
 
