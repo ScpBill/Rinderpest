@@ -2,8 +2,6 @@ from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, Emo
 from discord import NotFound, Message, Reaction, Member, Embed
 from discord.ext import commands
 
-from bot.misc.utils import segments_text, get_emoji
-
 import asyncio
 import sympy
 
@@ -24,6 +22,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
                             emoji: str = commands.parameter(description='Emoji'),
                             id_message: str = commands.parameter(description='ID message', default=None)):
         """Puts a reaction to the specified message so that after, the author clicks on it"""
+        from bot.misc.utils import get_emoji
 
         def check(this_reaction: Reaction, this_user: Member):
             return this_reaction.message == current_message and this_reaction.emoji == emoji and this_user == ctx.author
@@ -79,6 +78,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
     async def calculator(self, ctx: Context, *,
                          expression: str = commands.parameter(description='String with the expression')):
         """Calculating a mathematical expression"""
+        from bot.misc.utils import segments_text
 
         # Wait message
         await ctx.defer()
