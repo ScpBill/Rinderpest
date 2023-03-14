@@ -154,16 +154,17 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
                           ID: {'`%s`' % emoji.id}
                           Full name: {'`%s`' % emoji.__str__()}
                           Guild: {'`%s`' % getattr(emoji.guild, 'name', 'None')}
-                          User: {'`%s`' % getattr(emoji.user, 'display_name', 'None')}
-                          Created at: {'`%s`' % getattr(emoji, 'created_at', 'None')}''')
+                          Created at: {'`%s`' % emoji.created_at.strftime('%d %B %Y %H:%M:%S %Z')}''')
             embed.set_image(url=emoji.url)
         else:
-            embed = Embed(title='Info about «%s» emoji' % emoji, description=f'''Name: {'`%s`' % emoji}''')
+            embed = Embed(title='Info about «%s» emoji' % emoji,
+                          description=f'''It is standard emoji''')
 
         await ctx.reply(embed=embed)
 
     @send_reaction.error
     @calculator.error
+    @emoji.error
     async def argument_error(self, ctx: Context, error):
         if isinstance(error, MissingRequiredArgument):
             await ctx.send_help(ctx.command)
