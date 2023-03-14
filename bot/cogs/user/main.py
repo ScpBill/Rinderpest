@@ -1,5 +1,3 @@
-import re
-
 from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
 from discord import NotFound, Message, Reaction, Member, Embed, Emoji
 from discord.ext import commands
@@ -104,7 +102,6 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
             try:
                 fn = float(n := str(expr.evalf(30)))
                 number = f'{fn:.30g}' if expr.is_number else n
-                assert not expr.is_number
             except (SyntaxError, AttributeError, ValueError):
                 result = [str(expr), 'Value Error']
             except Exception as e:
