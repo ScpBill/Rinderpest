@@ -96,15 +96,15 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         else:
             try:
                 # Calculating expression
-                number = f'{float(expr.evalf(30)):g}' if expr.is_number else expr.evalf(30)
+                number = f'{float(expr.evalf(30)):g}' if expr.is_number else str(expr.evalf(30))
             except ValueError:
-                result = [expr]
+                result = [str(expr)]
             except AttributeError:
-                result = [expr, 'Value Error']
+                result = [str(expr), 'Value Error']
             except Exception as error:
-                result = [expr, type(error).__name__]
+                result = [str(expr), type(error).__name__]
             else:
-                result = [expr, number]
+                result = [str(expr), number]
 
         # Work with data | ```py\n{}\n```, max=1024 -> 6 + x + 4 ==> x <= 1014 | x... -> x == 1014 - 3 == 1011
         if len(expression) > 1014:
