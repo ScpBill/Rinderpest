@@ -5,7 +5,7 @@ from discord import Object, Message
 from discord.ext import commands
 
 from bot.misc.config import Config
-from bot.cogs.other.utils import PagesView, segments_text
+from bot.misc.utils import PagesView, segments_text
 
 import os
 import sys
