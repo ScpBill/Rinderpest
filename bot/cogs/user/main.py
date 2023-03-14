@@ -3,6 +3,8 @@ from discord import NotFound, Message, Reaction, Member, Embed
 from discord.ext import commands
 from discord.utils import get
 
+from bot.misc.utils import segments_text
+
 import asyncio
 import re
 import sympy
@@ -90,22 +92,40 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
 
         # Expressing
         try:
+            # Get expression from string
             expr: sympy.Expr | str = sympy.parse_expr(
-                expression, evaluate=True, transformations=sympy.parsing.sympy_parser.standard_transformations)
+                expression, evaluate=True, transformations=sympy.parsing.sympy_parser.T[:])
+            assert expr is not None
+        except (SyntaxError, AssertionError):
+            result = ['Syntax Error']
         except Exception as error:
-            expr, result = type(error).__name__, type(error).__name__
+            result = [type(error).__name__]
         else:
             try:
-                result = expr.evalf(30)
+                # Calculating expression
+                number = f'{float(expr.evalf(30)):g}' if expr.is_number else expr.evalf(30)
+            except ValueError:
+                result = [expr]
+            except AttributeError:
+                result = [expr, 'Value Error']
             except Exception as error:
-                result = type(error).__name__
+                result = [expr, type(error).__name__]
+            else:
+                result = [expr, number]
+
+        # Work with data | ```py\n{}\n```, max=1024 -> 6 + x + 4 ==> x <= 1014 | x... -> x == 1014 - 3 == 1011
+        if len(expression) > 1014:
+            expression = '{}...'.format(segments_text(expression, 1011)[0])
+        for element in range(len(result)):
+            if len(result[element]) > 1014:
+                result[element] = '{}...'.format(segments_text(result[element], 1011)[0])
 
         # Output
         embed = Embed(title='Math Calculator', description='Based on SymPy')
         embed.add_field(name='Your expression:', value='```py\n%s\n```' % expression, inline=False)
-        if expr != result:
-            embed.add_field(name='Simplified view:', value='```py\n%s\n```' % expr)
-        embed.add_field(name='Result:', value='```py\n%s\n```' % result)
+        if len(result) > 1:
+            embed.add_field(name='Simplified view:', value='```py\n%s\n```' % result.pop(0))
+        embed.add_field(name='Detailed result:', value='```py\n%s\n```' % result.pop(0))
         embed.set_author(name='by %s' % ctx.author.display_name, icon_url=ctx.author.avatar.url)
 
         # Send
