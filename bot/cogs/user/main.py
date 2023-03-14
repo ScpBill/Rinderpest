@@ -1,3 +1,5 @@
+import re
+
 from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
 from discord import NotFound, Message, Reaction, Member, Embed
 from discord.ext import commands
@@ -78,40 +80,44 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
     async def calculator(self, ctx: Context, *,
                          expression: str = commands.parameter(description='String with the expression')):
         """Calculating a mathematical expression"""
+
+        # Need imports
         from bot.misc.utils import segments_text
+        import sys
+        getattr(sys, 'set_int_max_str_digits', lambda _: None)(0)
 
         # Wait message
         await ctx.defer()
 
-        # Expressing
+        # Get expression from string
         try:
-            # Get expression from string
             expr: sympy.Expr | str = sympy.parse_expr(
                 expression, evaluate=True, transformations=sympy.parsing.sympy_parser.T[:])
             assert expr is not None
-        except (SyntaxError, AssertionError):
+        except (SyntaxError, AssertionError, ValueError):
             result = ['Syntax Error']
-        except Exception as error:
-            result = [type(error).__name__]
+        except Exception as e:
+            result = [type(e).__name__]
         else:
-            try:
-                # Calculating expression
-                number = f'{float(expr.evalf(30)):g}' if expr.is_number else str(expr.evalf(30))
-            except ValueError:
-                result = [str(expr)]
-            except AttributeError:
-                result = [str(expr), 'Value Error']
-            except Exception as error:
-                result = [str(expr), type(error).__name__]
-            else:
-                result = [str(expr), number]
 
-        # Work with data | ```py\n{}\n```, max=1024 -> 6 + x + 4 ==> x <= 1014 | x... -> x == 1014 - 3 == 1011
+            # Calculating expression
+            try:
+                fn = float(n := str(expr.evalf(30)))
+                number = f'{fn:.30g}' if expr.is_number else n
+                assert not expr.is_number
+            except (SyntaxError, AttributeError, ValueError):
+                result = [str(expr), 'Value Error']
+            except Exception as e:
+                result = [str(expr), type(e).__name__]
+            else:
+                result = [str(expr), number] if not expr.is_number else [number]
+
+        # Work with data | ```py\n{}\n```, max=1024 -> 6 + x + 4 ==> x <= 1014
         if len(expression) > 1014:
             expression = '{}...'.format(segments_text(expression, 1011)[0])
         for element in range(len(result)):
             if len(result[element]) > 1014:
-                result[element] = '{}...'.format(segments_text(result[element], 1011)[0])
+                result[element] = 'Value Error'
 
         # Output
         embed = Embed(title='Math Calculator', description='Based on SymPy')
@@ -119,7 +125,9 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         if len(result) > 1 and result[0] != result[1]:
             embed.add_field(name='Simplified view:', value='```py\n%s\n```' % result.pop(0))
         embed.add_field(name='Detailed result:', value='```py\n%s\n```' % result.pop(0))
-        embed.set_author(name='by %s' % ctx.author.display_name, icon_url=ctx.author.avatar.url)
+        embed.set_author(
+            name='by %s' % getattr(ctx.author, 'display_name', 'People'),
+            icon_url=getattr(ctx.author.avatar, 'url', ''))
 
         # Send
         await ctx.send(embed=embed)
