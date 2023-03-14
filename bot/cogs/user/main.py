@@ -1,7 +1,7 @@
 import re
 
 from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
-from discord import NotFound, Message, Reaction, Member, Embed
+from discord import NotFound, Message, Reaction, Member, Embed, Emoji
 from discord.ext import commands
 
 import asyncio
@@ -138,7 +138,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         from bot.misc.utils import get_emoji
 
         # Waiting message
-        await ctx.defer(ephemeral=True)
+        await ctx.defer()
 
         # Getting emoji
         emoji = get_emoji(self.bot, emoji)
@@ -146,8 +146,21 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
             return
 
-        # Message
-        embed = Embed(title=)
+        # Custom Emoji
+        if isinstance(emoji, Emoji):
+            embed = Embed(title='Info about «%s» emoji' % emoji, description=
+                          f'''Animated: {'`%s`' % emoji.animated}
+                          Name: {'`%s`' % emoji.name}
+                          ID: {'`%s`' % emoji.id}
+                          Full name: {'`%s`' % emoji.__str__()}
+                          Guild: {'`%s`' % getattr(emoji.guild, 'name', 'None')}
+                          User: {'`%s`' % getattr(emoji.user, 'display_name', 'None')}
+                          Created at: {'`%s`' % getattr(emoji, 'created_at', 'None')}''')
+            embed.set_image(url=emoji.url)
+        else:
+            embed = Embed(title='Info about «%s» emoji' % emoji, description=f'''Name: {'`%s`' % emoji}''')
+
+        await ctx.reply(embed=embed)
 
     @send_reaction.error
     @calculator.error
