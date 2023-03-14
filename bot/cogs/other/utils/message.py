@@ -71,3 +71,6 @@ class PagesView(View):
         await interaction.response.edit_message(
             content='```\n{}\n```'.format(self.pages[self.current_page] + postfix), view=self)
 
+
+async def setup(bot) -> None:
+    pass

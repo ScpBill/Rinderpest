@@ -17,3 +17,7 @@ def get_emoji(bot: Bot, data: str) -> [Emoji, str, None]:
     else:
         emoji = None
     return emoji
+
+
+async def setup(bot) -> None:
+    pass
