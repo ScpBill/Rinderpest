@@ -143,11 +143,11 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         if isinstance(emoji, Emoji):
             embed = Embed(title='Info about «%s» emoji' % emoji,
                           description=f'Animated: {"`%s`" % emoji.animated}'
-                                      f'Name: {"`%s`" % emoji.name}'
-                                      f'ID: {"`%s`" % emoji.id}'
-                                      f'Full name: {"`%s`" % emoji.__str__()}'
-                                      f'Guild: {"`%s`" % getattr(emoji.guild, "name", "None")}'
-                                      f'Created at: {"`%s`" % emoji.created_at.strftime("%d %B %Y %H:%M:%S %Z")}')
+                                      f'\nName: {"`%s`" % emoji.name}'
+                                      f'\nID: {"`%s`" % emoji.id}'
+                                      f'\nFull name: {"`%s`" % emoji.__str__()}'
+                                      f'\nGuild: {"`%s`" % getattr(emoji.guild, "name", "None")}'
+                                      f'\nCreated at: {"`%s`" % emoji.created_at.strftime("%d %B %Y %H:%M:%S %Z")}')
             embed.set_image(url=emoji.url)
         else:
             embed = Embed(title='Info about «%s» emoji' % emoji,
