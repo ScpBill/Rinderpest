@@ -28,6 +28,8 @@ def get_emoji(bot: Bot, data: str) -> [Emoji, str, None]:
         emoji = bot.get_emoji(int(data))
     elif re.fullmatch(r'(:\w+:)|(<\w*:\w+:\w+>)', data):  # :emoji: | <*a:emoji:id>
         emoji = utils.get(bot.emojis, name=data.split(':')[1])
+    elif isinstance(data, str) and re.match(r'^(?:http|ftp)s?://', data):
+        emoji = utils.get(bot.emojis, url=data)
     elif isinstance(data, str):  # Standard
         emoji = data if data in all_emoji else None
     else:
