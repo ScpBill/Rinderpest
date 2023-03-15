@@ -1,8 +1,12 @@
+from discord.ext.commands import Bot
 from discord.enums import ButtonStyle
 from discord.ui import View, Button
-from discord import Interaction, Message, InteractionResponse
+from discord import Interaction, Emoji
 
-from discord import ui
+from discord import ui, utils
+from emoji_list import all_emoji
+
+import re
 
 
 def segments_text(text: str, max_length: int) -> list[str]:
@@ -15,6 +19,20 @@ def segments_text(text: str, max_length: int) -> list[str]:
                 segments.pop()
             segments.extend([line[s:s + max_length] for s in range(0, len(line), max_length)])
     return segments
+
+
+def get_emoji(bot: Bot, data: str) -> [Emoji, str, None]:
+    if utils.get(bot.emojis, name=data):  # Emoji
+        emoji = utils.get(bot.emojis, name=data)
+    elif data.isnumeric():  # ID
+        emoji = bot.get_emoji(int(data))
+    elif re.fullmatch(r'(:\w+:)|(<\w*:\w+:\w+>)', data):  # :emoji: | <*a:emoji:id>
+        emoji = utils.get(bot.emojis, name=data.split(':')[1])
+    elif isinstance(data, str):  # Standard
+        emoji = data if data in all_emoji else None
+    else:
+        emoji = None
+    return emoji
 
 
 class PagesView(View):
@@ -70,4 +88,3 @@ class PagesView(View):
 
         await interaction.response.edit_message(
             content='```\n{}\n```'.format(self.pages[self.current_page] + postfix), view=self)
-

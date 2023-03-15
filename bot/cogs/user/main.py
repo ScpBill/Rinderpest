@@ -2,8 +2,11 @@ from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, Emo
 from discord import NotFound, Message, Reaction, Member, Embed, Emoji
 from discord.ext import commands
 
+import importlib
 import asyncio
 import sympy
+import sys
+utils = importlib.import_module('bot.misc.utils')
 
 
 # todo: UserCogs
@@ -22,7 +25,6 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
                             emoji: str = commands.parameter(description='Emoji'),
                             id_message: str = commands.parameter(description='ID message', default=None)):
         """Puts a reaction to the specified message so that after, the author clicks on it"""
-        from bot.misc.utils import get_emoji
 
         def check(this_reaction: Reaction, this_user: Member):
             return this_reaction.message == current_message and this_reaction.emoji == emoji and this_user == ctx.author
@@ -31,6 +33,10 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         await ctx.defer(ephemeral=True)
         if not ctx.interaction:
             await ctx.message.delete()
+
+        # Need imports
+        importlib.reload(utils)
+        get_emoji = getattr(utils, 'get_emoji')
 
         # Getting emoji
         emoji = get_emoji(self.bot, emoji)
@@ -55,10 +61,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # Add reaction to message
         try:
             await current_message.add_reaction(emoji)
-        except NotFound:
-            await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
-            return
-        except TypeError:
+        except (NotFound, TypeError):
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
             return
 
@@ -79,13 +82,13 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
                          expression: str = commands.parameter(description='String with the expression')):
         """Calculating a mathematical expression"""
 
-        # Need imports
-        from bot.misc.utils import segments_text
-        import sys
-        getattr(sys, 'set_int_max_str_digits', lambda _: None)(0)
-
         # Wait message
         await ctx.defer()
+
+        # Need imports
+        importlib.reload(utils)
+        segments_text = getattr(utils, 'segments_text')
+        getattr(sys, 'set_int_max_str_digits', lambda _: None)(0)
 
         # Get expression from string
         try:
@@ -132,10 +135,13 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
     @commands.hybrid_command()
     async def emoji(self, ctx: Context, emoji: str = commands.parameter(description='Emoji')):
         """Get info about emoji"""
-        from bot.misc.utils import get_emoji
 
         # Waiting message
         await ctx.defer()
+
+        # Need imports
+        importlib.reload(utils)
+        get_emoji = getattr(utils, 'get_emoji')
 
         # Getting emoji
         emoji = get_emoji(self.bot, emoji)

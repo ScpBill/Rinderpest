@@ -1,15 +1,13 @@
 from discord.ext.commands import Bot
 
-from bot.cogs.admin import setup_admin_cogs
-from bot.cogs.other import setup_other_cogs
-from bot.cogs.user import setup_user_cogs
+import importlib
+manager = importlib.import_module('bot.misc.utils.server')
 
 
 async def setup_all_cogs(bot: Bot) -> None:
-    cogs = (
-        setup_user_cogs,
-        setup_admin_cogs,
-        setup_other_cogs,
-    )
-    for cog in cogs:
-        await cog(bot)
+    log = await manager.use_cogs('all', '', bot.load_extension)
+    for data in log:
+        if isinstance(data, str):
+            print(f'[+] Cog «{data}» has been successfully load')
+        elif isinstance(data, tuple):
+            print('[-] {}'.format(data[0]))
