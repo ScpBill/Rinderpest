@@ -2,8 +2,7 @@ from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument
 from discord.ext import commands
 
 from bot.misc.config import Config
-
-import importlib
+from bot.misc.ext import use_cogs
 
 
 class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and loading cogs into them'):
@@ -21,14 +20,13 @@ class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and l
                       group: str = commands.parameter(description='Cogs folder'),
                       cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for reload the bot cogs. Cogs are separated by space."""
-        use_cogs = getattr(self.bot.get_cog('ManageServer'), 'use_cogs')
 
         # Check on author is me
         if ctx.message.author.id != Config.ID_ME:
             return
 
         # Logging and Reloading Extension
-        log = await use_cogs(group, cogs, self.bot.reload_extension)
+        log = await use_cogs(self.bot, group, cogs, 'reload')
         msg, success, failed = '**Result of the command execution:**', 0, 0
         for data in log:
             if isinstance(data, str):
@@ -47,14 +45,13 @@ class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and l
                     group: str = commands.parameter(description='Cogs folder'),
                     cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for load the bot cogs. Cogs are separated by space."""
-        use_cogs = getattr(self.bot.get_cog('ManageServer'), 'use_cogs')
 
         # Check on author is me
         if ctx.message.author.id != Config.ID_ME:
             return
 
         # Logging and Loading Extension
-        log = await use_cogs(group, cogs, self.bot.load_extension)
+        log = await use_cogs(self.bot, group, cogs, 'load')
         msg, success, failed = '**Result of the command execution:**', 0, 0
         for data in log:
             if isinstance(data, str):
@@ -73,14 +70,13 @@ class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and l
                       group: str = commands.parameter(description='Cogs folder'),
                       cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for unload the bot cogs. Cogs are separated by space."""
-        use_cogs = getattr(self.bot.get_cog('ManageServer'), 'use_cogs')
 
         # Check on author is me
         if ctx.message.author.id != Config.ID_ME:
             return
 
         # Logging and Unloading Extension
-        log = await use_cogs(group, cogs, self.bot.unload_extension)
+        log = await use_cogs(self.bot, group, cogs, 'unload')
         msg, success, failed = '**Result of the command execution:**', 0, 0
         for data in log:
             if isinstance(data, str):

@@ -13,15 +13,16 @@ class ManageChat(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
 
-    async def get_emoji(self, data: str) -> [Emoji, str, None]:
-        if utils.get(self.bot.emojis, name=data):  # Emoji
-            emoji = utils.get(self.bot.emojis, name=data)
+    @staticmethod
+    async def get_emoji(bot, data: str) -> [Emoji, str, None]:
+        if utils.get(bot.emojis, name=data):  # Emoji
+            emoji = utils.get(bot.emojis, name=data)
         elif data.isnumeric():  # ID
-            emoji = self.bot.get_emoji(int(data))
+            emoji = bot.get_emoji(int(data))
         elif re.fullmatch(r'(:\w+:)|(<\w*:\w+:\w+>)', data):  # :emoji: | <*a:emoji:id>
-            emoji = utils.get(self.bot.emojis, name=data.split(':')[1])
+            emoji = utils.get(bot.emojis, name=data.split(':')[1])
         elif isinstance(data, str) and re.match(r'^(?:http|ftp)s?://', data):
-            emoji = utils.get(self.bot.emojis, url=data)
+            emoji = utils.get(bot.emojis, url=data)
         elif isinstance(data, str):  # Standard
             emoji = data if data in all_emoji else None
         else:

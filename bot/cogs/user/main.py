@@ -34,7 +34,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
             await ctx.message.delete()
 
         # Getting emoji
-        emoji = get_emoji(self.bot, emoji)
+        emoji = await get_emoji(self.bot, emoji)
         if emoji is None:
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
             return
@@ -134,24 +134,24 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         await ctx.defer()
 
         # Getting emoji
-        emoji = get_emoji(self.bot, emoji)
+        emoji = await get_emoji(self.bot, emoji)
         if emoji is None:
             await ctx.send(r'Sorry, could not find the specified emoji. ¯\_(ツ)_/¯', ephemeral=True)
             return
 
         # Custom Emoji
         if isinstance(emoji, Emoji):
-            embed = Embed(title='Info about «%s» emoji' % emoji, description=
-f'''Animated: {'`%s`' % emoji.animated}
-Name: {'`%s`' % emoji.name}
-ID: {'`%s`' % emoji.id}
-Full name: {'`%s`' % emoji.__str__()}
-Guild: {'`%s`' % getattr(emoji.guild, 'name', 'None')}
-Created at: {'`%s`' % emoji.created_at.strftime('%d %B %Y %H:%M:%S %Z')}''')
+            embed = Embed(title='Info about «%s» emoji' % emoji,
+                          description=f'Animated: {"`%s`" % emoji.animated}'
+                                      f'Name: {"`%s`" % emoji.name}'
+                                      f'ID: {"`%s`" % emoji.id}'
+                                      f'Full name: {"`%s`" % emoji.__str__()}'
+                                      f'Guild: {"`%s`" % getattr(emoji.guild, "name", "None")}'
+                                      f'Created at: {"`%s`" % emoji.created_at.strftime("%d %B %Y %H:%M:%S %Z")}')
             embed.set_image(url=emoji.url)
         else:
             embed = Embed(title='Info about «%s» emoji' % emoji,
-                          description=f'''It is standard emoji''')
+                          description='It is standard emoji')
 
         await ctx.reply(embed=embed)
 
