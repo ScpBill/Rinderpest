@@ -4,7 +4,6 @@ from discord.ext import commands
 from bot.misc.config import Config
 
 import importlib
-manager = importlib.import_module('bot.misc.utils')
 
 
 class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and loading cogs into them'):
@@ -22,8 +21,7 @@ class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and l
                       group: str = commands.parameter(description='Cogs folder'),
                       cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for reload the bot cogs. Cogs are separated by space."""
-        importlib.reload(manager)
-        use_cogs = manager.use_cogs
+        use_cogs = getattr(self.bot.get_cog('ManageServer'), 'use_cogs')
 
         # Check on author is me
         if ctx.message.author.id != Config.ID_ME:
@@ -49,8 +47,7 @@ class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and l
                     group: str = commands.parameter(description='Cogs folder'),
                     cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for load the bot cogs. Cogs are separated by space."""
-        importlib.reload(manager)
-        use_cogs = manager.use_cogs
+        use_cogs = getattr(self.bot.get_cog('ManageServer'), 'use_cogs')
 
         # Check on author is me
         if ctx.message.author.id != Config.ID_ME:
@@ -76,8 +73,7 @@ class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and l
                       group: str = commands.parameter(description='Cogs folder'),
                       cogs: str = commands.parameter(description='Cogs names', default='')) -> None:
         """Using for unload the bot cogs. Cogs are separated by space."""
-        importlib.reload(manager)
-        use_cogs = manager.use_cogs
+        use_cogs = getattr(self.bot.get_cog('ManageServer'), 'use_cogs')
 
         # Check on author is me
         if ctx.message.author.id != Config.ID_ME:

@@ -3,10 +3,7 @@ from discord import Embed, Color
 
 from discord.ext import commands
 
-import importlib
-import sys
-
-Config = importlib.import_module('bot.misc.config').Config
+from bot.misc.config import Config
 
 
 class MainHelpCommand(HelpCommand):
@@ -20,7 +17,6 @@ class MainHelpCommand(HelpCommand):
         return '`%s%s`' % (self.context.clean_prefix, command.qualified_name)
 
     async def filter_commands(self, list_commands: [list, set], /, *, sort: bool = False, key=None) -> list[Command]:
-        importlib.reload(sys.modules[Config.__module__])
 
         show_hidden = self.context.author.id == Config.ID_ME
         iterator = list_commands if show_hidden else filter(lambda c: not c.hidden, list_commands)

@@ -2,11 +2,9 @@ from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, Emo
 from discord import NotFound, Message, Reaction, Member, Embed, Emoji
 from discord.ext import commands
 
-import importlib
 import asyncio
 import sympy
 import sys
-utils = importlib.import_module('bot.misc.utils')
 
 
 # todo: UserCogs
@@ -25,6 +23,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
                             emoji: str = commands.parameter(description='Emoji'),
                             id_message: str = commands.parameter(description='ID message', default=None)):
         """Puts a reaction to the specified message so that after, the author clicks on it"""
+        get_emoji = getattr(self.bot.get_cog('ManageChat'), 'get_emoji')
 
         def check(this_reaction: Reaction, this_user: Member):
             return this_reaction.message == current_message and this_reaction.emoji == emoji and this_user == ctx.author
@@ -33,10 +32,6 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         await ctx.defer(ephemeral=True)
         if not ctx.interaction:
             await ctx.message.delete()
-
-        # Need imports
-        importlib.reload(utils)
-        get_emoji = getattr(utils, 'get_emoji')
 
         # Getting emoji
         emoji = get_emoji(self.bot, emoji)
@@ -86,8 +81,6 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         await ctx.defer()
 
         # Need imports
-        importlib.reload(utils)
-        segments_text = getattr(utils, 'segments_text')
         getattr(sys, 'set_int_max_str_digits', lambda _: None)(0)
 
         # Get expression from string
@@ -114,7 +107,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
 
         # Work with data | ```py\n{}\n```, max=1024 -> 6 + x + 4 ==> x <= 1014
         if len(expression) > 1014:
-            expression = '{}...'.format(segments_text(expression, 1011)[0])
+            expression = '{}...'.format(expression[:1011])
         for element in range(len(result)):
             if len(result[element]) > 1014:
                 result[element] = 'Value Error'
@@ -135,13 +128,10 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
     @commands.hybrid_command()
     async def emoji(self, ctx: Context, emoji: str = commands.parameter(description='Emoji')):
         """Get info about emoji"""
+        get_emoji = getattr(self.bot.get_cog('ManageChat'), 'get_emoji')
 
         # Waiting message
         await ctx.defer()
-
-        # Need imports
-        importlib.reload(utils)
-        get_emoji = getattr(utils, 'get_emoji')
 
         # Getting emoji
         emoji = get_emoji(self.bot, emoji)

@@ -4,14 +4,12 @@ from discord import Object, Message
 
 from discord.ext import commands
 
+from bot.misc.config import Config
+
 import os
 import sys
 from subprocess import check_output, CalledProcessError
 import shlex
-import importlib
-
-utils = importlib.import_module('bot.misc.utils')
-Config = importlib.import_module('bot.misc.config').Config
 
 
 class ServerCog(Cog, name='Server manager', description='Version control of the remote bot'):
@@ -22,7 +20,6 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
     @commands.command(name='update', hidden=True)
     async def _update(self, ctx: Context) -> None:
         """Updating data via a remote git repository"""
-        importlib.reload(sys.modules[Config.__module__])
 
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
@@ -50,7 +47,6 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
     @commands.command(name='restart', hidden=True)
     async def _restart(self, ctx: Context) -> None:
         """Restarting bot"""
-        importlib.reload(sys.modules[Config.__module__])
 
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
@@ -66,8 +62,7 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
     async def _git_cmd(self, ctx: Context, *,
                        args: str = commands.parameter(description='Command Line Arguments')) -> None:
         """Executing git commands via the bot command"""
-        importlib.reload(sys.modules[Config.__module__])
-        importlib.reload(utils)
+        pages_view = getattr(self.bot.get_cog('ManageChat'), 'PagesView')
 
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
@@ -85,7 +80,8 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
         if len(output) >= 1993:
             # [x = len(output)]:  x == 1988 + 4  ==>  x == 1992
             cut_output = '{}\n...'.format(output[:1988])
-            await ctx.reply(content='```\n{}\n```'.format(cut_output), view=utils.PagesView(text=output))
+            await ctx.reply(content='```\n{}\n```'.format(cut_output),
+                            view=pages_view(text=output))
 
         # Sending result
         await ctx.reply(content='```\n{}\n```'.format(output))
@@ -96,8 +92,7 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
     async def _console(self, ctx: Context, *,
                        args: str = commands.parameter(description='Command Line Arguments')) -> None:
         """Executing console commands via the bot command"""
-        importlib.reload(sys.modules[Config.__module__])
-        importlib.reload(utils)
+        pages_view = getattr(self.bot.get_cog('ManageChat'), 'PagesView')
 
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
@@ -114,7 +109,8 @@ class ServerCog(Cog, name='Server manager', description='Version control of the 
         if len(output) >= 1993:
             # [x = len(output)]:  x == 1988 + 4  ==>  x == 1992
             cut_output = '{}\n...'.format(output[:1988])
-            await ctx.reply(content='```\n{}\n```'.format(cut_output), view=utils.PagesView(text=output))
+            await ctx.reply(content='```\n{}\n```'.format(cut_output),
+                            view=pages_view(text=output))
 
         # Sending result
         await ctx.reply(content='```\n{}\n```'.format(output))
@@ -137,7 +133,6 @@ class ApplicationCog(Cog, name='Bot Manager', description='Managing the work of 
     @commands.command(name='sync', hidden=True)
     async def _sync(self, ctx: Context) -> None:
         """Synchronization of slash commands"""
-        importlib.reload(sys.modules[Config.__module__])
 
         # Check on author is me
         if ctx.author.id != Config.ID_ME:
