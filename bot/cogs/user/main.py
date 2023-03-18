@@ -142,7 +142,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # Custom Emoji
         if isinstance(emoji, Emoji):
             embed = Embed(title='Info about «%s» emoji' % emoji,
-                          description=f'It is custom emoji'
+                          description=f'*It is custom emoji*'
                                       f'\nAnimated: {"`%s`" % emoji.animated}'
                                       f'\nName: {"`%s`" % emoji.name}'
                                       f'\nID: {"`%s`" % emoji.id}'
@@ -153,7 +153,7 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
 
         else:
             embed = Embed(title='Info about «%s» emoji' % emoji[0],
-                          description=f'It is standard emoji'
+                          description=f'*It is standard emoji*'
                                       f'\nIcon: {"`%s`" % emoji[0]}'
                                       f'\nName: {"`%s`" % emoji[1]}')
 

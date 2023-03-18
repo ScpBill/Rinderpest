@@ -25,7 +25,7 @@ class ManageChat(Cog):
             emoji = utils.get(bot.emojis, url=data)
         elif isinstance(data, str):  # Standard
             data = emojize(data, language='alias', variant='emoji_type')
-            emoji = (data, demojize(data, language='alias')) if is_emoji(data) else None
+            emoji = (data, demojize(data, language='alias', delimiters=('', ''))) if is_emoji(data) else None
         else:
             emoji = None
         return emoji
