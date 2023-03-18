@@ -142,16 +142,20 @@ class __MainUserCog(Cog, name='General', description='Basic user commands'):
         # Custom Emoji
         if isinstance(emoji, Emoji):
             embed = Embed(title='Info about «%s» emoji' % emoji,
-                          description=f'Animated: {"`%s`" % emoji.animated}'
+                          description=f'It is custom emoji'
+                                      f'\nAnimated: {"`%s`" % emoji.animated}'
                                       f'\nName: {"`%s`" % emoji.name}'
                                       f'\nID: {"`%s`" % emoji.id}'
                                       f'\nFull name: {"`%s`" % emoji.__str__()}'
                                       f'\nGuild: {"`%s`" % getattr(emoji.guild, "name", "None")}'
                                       f'\nCreated at: {"`%s`" % emoji.created_at.strftime("%d %B %Y %H:%M:%S %Z")}')
             embed.set_image(url=emoji.url)
+
         else:
-            embed = Embed(title='Info about «%s» emoji' % emoji,
-                          description='It is standard emoji')
+            embed = Embed(title='Info about «%s» emoji' % emoji[0],
+                          description=f'It is standard emoji'
+                                      f'\nIcon: {"`%s`" % emoji[0]}'
+                                      f'\nName: {"`%s`" % emoji[1]}')
 
         await ctx.reply(embed=embed)
 

@@ -4,7 +4,7 @@ from discord.ui import View, Button
 from discord import Interaction, Emoji
 
 from discord import ui, utils
-from emoji_list import all_emoji
+from emoji import is_emoji, emojize, demojize
 
 import re
 
@@ -14,7 +14,7 @@ class ManageChat(Cog):
         self.bot = bot
 
     @staticmethod
-    async def get_emoji(bot, data: str) -> [Emoji, str, None]:
+    async def get_emoji(bot, data: str) -> [Emoji, tuple, None]:
         if utils.get(bot.emojis, name=data):  # Emoji
             emoji = utils.get(bot.emojis, name=data)
         elif data.isnumeric():  # ID
@@ -24,7 +24,8 @@ class ManageChat(Cog):
         elif isinstance(data, str) and re.match(r'^(?:http|ftp)s?://', data):
             emoji = utils.get(bot.emojis, url=data)
         elif isinstance(data, str):  # Standard
-            emoji = data if data in all_emoji else None
+            data = emojize(data, language='alias', variant='emoji_type')
+            emoji = (data, demojize(data, language='alias')) if is_emoji(data) else None
         else:
             emoji = None
         return emoji
