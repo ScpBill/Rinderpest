@@ -1,11 +1,6 @@
-from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument, EmojiNotFound
-from discord import NotFound, Message, Reaction, Member, Embed, Emoji
+from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument
 from discord.ext import commands
 from discord import app_commands
-
-import asyncio
-import sympy
-import sys
 
 
 FONTS = {
@@ -24,6 +19,25 @@ FONTS = {
     'sans-serif-bold-italic': '----------𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯',
     'monospace':              '𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣'
 }
+STYLES = [
+    app_commands.Choice(name='𝐁𝐨𝐥𝐝', value='bold'),
+    app_commands.Choice(name='𝐼𝑡𝑎𝑙𝑖𝑐', value='italic'),
+    app_commands.Choice(name='𝑩𝒐𝒍𝒅 𝑰𝒕𝒂𝒍𝒊𝒄', value='bold italic'),
+    app_commands.Choice(name='𝒮𝒸𝓇𝒾𝓅𝓉', value='script'),
+    app_commands.Choice(name='𝓑𝓸𝓵𝓭 𝓢𝓬𝓻𝓲𝓹𝓽', value='bold script'),
+    app_commands.Choice(name='𝔉𝔯𝔞𝔨𝔱𝔲𝔯', value='fraktur'),
+    app_commands.Choice(name='𝔻𝕠𝕦𝕓𝕝𝕖-𝕤𝕥𝕣𝕦𝕔𝕜', value='double-struck'),
+    app_commands.Choice(name='𝕭𝖔𝖑𝖉 𝕱𝖗𝖆𝖐𝖙𝖚𝖗', value='bold fraktur'),
+    app_commands.Choice(name='𝖲𝖺𝗇𝗌-𝗌𝖾𝗋𝗂𝖿', value='sans-serif'),
+    app_commands.Choice(name='𝗦𝗮𝗻𝘀-𝗦𝗲𝗿𝗶𝗳 𝗕𝗼𝗹𝗱', value='sans-serif bold'),
+    app_commands.Choice(name='𝘚𝘢𝘯𝘴-𝘚𝘦𝘳𝘪𝘧 𝘐𝘵𝘢𝘭𝘪𝘤', value='sans-serif italic'),
+    app_commands.Choice(name='𝙎𝙖𝙣𝙨-𝙎𝙚𝙧𝙞𝙛 𝘽𝙤𝙡𝙙 𝙄𝙩𝙖𝙡𝙞𝙘', value='sans-serif bold italic'),
+    app_commands.Choice(name='𝙼𝚘𝚗𝚘𝚜𝚙𝚊𝚌𝚎', value='monospace')
+]
+
+
+async def font_style_autocomplete(ctx, current: str) -> [app_commands.Choice[str]]:
+    return [style for style in STYLES if current.lower() in style.value]
 
 
 class FeaturesCogs(Cog, name='Features', description='Other user commands'):
@@ -32,39 +46,26 @@ class FeaturesCogs(Cog, name='Features', description='Other user commands'):
         self.bot = bot
 
     @commands.hybrid_command()
-    @app_commands.choices(style=[
-        app_commands.Choice(name='𝐁𝐨𝐥𝐝', value='bold'),
-        app_commands.Choice(name='𝐼𝑡𝑎𝑙𝑖𝑐', value='italic'),
-        app_commands.Choice(name='𝑩𝒐𝒍𝒅 𝑰𝒕𝒂𝒍𝒊𝒄', value='bold-italic'),
-        app_commands.Choice(name='𝒮𝒸𝓇𝒾𝓅𝓉', value='script'),
-        app_commands.Choice(name='𝓑𝓸𝓵𝓭 𝓢𝓬𝓻𝓲𝓹𝓽', value='bold-script'),
-        app_commands.Choice(name='𝔉𝔯𝔞𝔨𝔱𝔲𝔯', value='fraktur'),
-        app_commands.Choice(name='𝔻𝕠𝕦𝕓𝕝𝕖-𝕤𝕥𝕣𝕦𝕔𝕜', value='double-struck'),
-        app_commands.Choice(name='𝕭𝖔𝖑𝖉 𝕱𝖗𝖆𝖐𝖙𝖚𝖗', value='bold-fraktur'),
-        app_commands.Choice(name='𝖲𝖺𝗇𝗌-𝗌𝖾𝗋𝗂𝖿', value='sans-serif'),
-        app_commands.Choice(name='𝗦𝗮𝗻𝘀 𝗦𝗲𝗿𝗶𝗳 𝗕𝗼𝗹𝗱', value='sans-serif-bold'),
-        app_commands.Choice(name='𝘚𝘢𝘯𝘴 𝘚𝘦𝘳𝘪𝘧 𝘐𝘵𝘢𝘭𝘪𝘤', value='sans-serif-italic'),
-        app_commands.Choice(name='𝙎𝙖𝙣𝙨 𝙎𝙚𝙧𝙞𝙛 𝘽𝙤𝙡𝙙 𝙄𝙩𝙖𝙡𝙞𝙘', value='sans-serif-bold-italic'),
-        app_commands.Choice(name='𝙼𝚘𝚗𝚘𝚜𝚙𝚊𝚌𝚎', value='monospace')
-    ])
-    async def font(self, ctx: Context,
-                   style: str = commands.parameter(description='Style font of your text, long name is separated with `-`'), *,
-                   text: str = commands.parameter(description='Your text')):
+    @app_commands.describe(style='Style font of your text, long name is separated with `-`', text='Your text')
+    @app_commands.autocomplete(style=font_style_autocomplete)
+    async def font(self, ctx: Context, style: str, *, text: str):
         """The font generator: write and copy!"""
-        
+
         # Wait message
         await ctx.defer()
-        if style not in FONTS.keys():
-            return await ctx.reply('**The font is specified incorrectly.**\n*Available fonts*: %s' % ' '.join([f'`{name}`' for name in FONTS.keys()]))
-        
-        alphabet, decorated = FONTS['regular'], FONTS[style]
+        if (style := style.lower().replace(' ', '-')) not in FONTS.keys():
+            return await ctx.reply(
+                '**The font is specified incorrectly.**\n*Available fonts*: %s'
+                % ' '.join([f'`{name}`' for name in FONTS.keys()]))
+
         # Replace symbols
+        alphabet, decorated = FONTS['regular'], FONTS[style]
         try:
             await ctx.reply(''.join([decorated[alphabet.index(char)] if
                                      char in alphabet and decorated[alphabet.index(char)] != '-' else char
                                      for char in text]))
         except IndexError:
-            await ctx.reply('Sorry, an unintentional error has occured.')
+            await ctx.reply('Sorry, an unintentional error has occurred.')
 
     @font.error
     async def argument_error(self, ctx: Context, error):
