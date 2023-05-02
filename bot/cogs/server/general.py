@@ -4,7 +4,7 @@ from discord import Object, Message
 
 from discord.ext import commands
 
-from bot.misc.config import Config
+from bot.spec.config import Config
 
 import os
 import sys

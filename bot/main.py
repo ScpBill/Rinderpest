@@ -1,20 +1,28 @@
-import asyncio
-
 from discord import Intents
-from discord.ext.commands import Bot
+from discord.ext import commands
 
-from bot.misc import Env, Config
-from bot.cogs import setup_all_cogs
-from bot.database.models import register_models
+from bot.spec.env import Env
+from bot.spec.config import Config
 
 
 def start_bot():
-    intents = Intents.default()
-    intents.message_content = True
-
-    bot = Bot(Config.CMD_PREFIX, intents=intents)
-
-    asyncio.run(setup_all_cogs(bot))
-    register_models()
-
+    bot = RinderpestBot(Intents.all())
     bot.run(Env.TOKEN)
+
+
+class RinderpestBot(commands.Bot):
+    def __init__(self, intents: Intents, **kwargs):
+        super().__init__(command_prefix=commands.when_mentioned_or(Config.CMD_PREFIX), intents=intents, **kwargs)
+
+    async def setup_hook(self):
+        for cog in Config.STANDARD_COGS:
+            path = f'bot.cogs.{cog}'
+            try:
+                await self.load_extension(path)
+            except Exception as exc:
+                print(f'[-] Could not load extension {cog} due to {exc.__class__.__name__}: {exc}')
+            else:
+                print(f'[+] The {cog} extension has been successfully installed')
+
+    async def on_ready(self):
+        print(f'Logged on as {self.user} (ID: {self.user.id})')

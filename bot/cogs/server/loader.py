@@ -2,7 +2,7 @@ from discord.ext.commands import Cog, Bot, Context, MissingRequiredArgument
 from discord.ext import commands
 
 from bot.misc.config import Config
-from bot.misc.ext import use_cogs
+from bot.misc.loader import use_cogs
 
 
 class LoaderCog(Cog, name='Cogs manager', description='Managing extensions and loading cogs into them'):

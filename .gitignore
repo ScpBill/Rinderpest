@@ -1,7 +1,8 @@
+/venv/
 /.idea/
-.env
-.gitconfig
-__pycache__/
 /.local/
 /.cache/
+__pycache__/
+.env
+.gitconfig
 *.pyc
