@@ -25,4 +25,4 @@ class RinderpestBot(commands.Bot):
                 print(f'[+] The {cog} extension has been successfully installed')
 
     async def on_ready(self):
-        print(f'Logged on as {self.user} (ID: {self.user.id})')
+        print(f'[**] Logged on as "{self.user}" (ID: {self.user.id})')
