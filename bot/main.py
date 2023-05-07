@@ -12,10 +12,11 @@ def start_bot():
 
 class RinderpestBot(commands.Bot):
     def __init__(self, intents: Intents, **kwargs):
-        super().__init__(command_prefix=commands.when_mentioned_or(Config.CMD_PREFIX), intents=intents, **kwargs)
+        super().__init__(command_prefix=commands.when_mentioned_or(Config.CMD_PREFIX), intents=intents,
+                         case_insensitive=True, strip_after_prefix=True, **kwargs)
 
     async def setup_hook(self):
-        for cog in Config.STANDARD_COGS:
+        for cog in Config.STANDARD_EXTENSIONS:
             path = f'bot.cogs.{cog}'
             try:
                 await self.load_extension(path)
