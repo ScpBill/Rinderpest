@@ -23,7 +23,8 @@ class CommandsManagement(Cog, name='Commands Management', description='Managing 
         self.bot.tree.copy_global_to(guild=self.guild)
         success_commands: list[AppCommand] = await self.bot.tree.sync(guild=self.guild)
 
-        msg = '**Successfully synchronized commands:**\n%s' % ' '.join([command.mention for command in success_commands])
+        msg = '**Successfully synchronized commands:**\n%s' % ' '.join(
+            [command.mention for command in success_commands])
         await ctx.reply(msg, mention_author=False)
 
 

@@ -12,7 +12,7 @@ class Loader(Cog, name='Loader', description='Managing extensions and loading co
              command_attrs=dict(hidden=True, guild_ids=[Config.ID_GUILD])):
     successful = '\n> `✅` Extension `{cog}` is successful {do}ed'
     unsuccessful = '\n> `❌` Extension `{cog}` is not {do}ed due to `{exc.__class__.__name__}`: ||`{exc}`||'
-    answer = '**Results of {do} extensions:**'
+    answer = '**Results of {} extensions:**'
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -73,7 +73,7 @@ class Loader(Cog, name='Loader', description='Managing extensions and loading co
     @app_commands.describe(extensions='Choose file from the list')
     @commands.is_owner()
     async def _ext_unload(self, ctx: Context, *, extensions: str) -> None:
-        answer = await ctx.reply(self.answer.format(do='unload'), mention_author=False)
+        answer = await ctx.reply(self.answer.format('unload'), mention_author=False)
 
         for path in self.get_extensions(extensions, cog_name=extensions if '.' in extensions else None):
             cog = '.'.join(path.split('.')[2:])  # Remove 'bot.cogs.' from the path name
@@ -94,7 +94,7 @@ class Loader(Cog, name='Loader', description='Managing extensions and loading co
     @app_commands.describe(extensions='Choose file from the list')
     @commands.is_owner()
     async def _ext_reload(self, ctx: Context, *, extensions: str) -> None:
-        answer = await ctx.reply(self.answer.format(do='reload'), mention_author=False)
+        answer = await ctx.reply(self.answer.format('reload'), mention_author=False)
 
         for path in self.get_extensions(extensions, cog_name=extensions if '.' in extensions else None):
             cog = '.'.join(path.split('.')[2:])  # Remove 'bot.cogs.' from the path name
