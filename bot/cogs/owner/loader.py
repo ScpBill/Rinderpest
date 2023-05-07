@@ -29,8 +29,8 @@ class Loader(Cog, name='Loader', description='Managing extensions and loading co
             return [f'bot.cogs.{cog_name}']
 
         extensions = []
-        for _dir_name in os.listdir('bot\\cogs\\'):
-            if not (os.path.isdir(_dir := os.path.join('bot\\cogs\\', _dir_name))) or (
+        for _dir_name in os.listdir('./bot/cogs'):
+            if not (os.path.isdir(_dir := os.path.join('./bot/cogs', _dir_name))) or (
                     folder not in ('all', _dir_name)):
                 continue
             for _ext_name in os.listdir(_dir):
@@ -144,7 +144,7 @@ class Loader(Cog, name='Loader', description='Managing extensions and loading co
             if current.lower() in (_small_ext := '.'.join(_extension.split('.')[2:])):
                 filtered_extensions.append(_small_ext)
 
-        for _folder in os.listdir('bot\\cogs\\'):
+        for _folder in os.listdir('./bot/cogs'):
             if not check_dir(_folder):
                 continue
             if current.lower() in _folder:
