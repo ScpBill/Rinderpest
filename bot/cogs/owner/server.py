@@ -1,6 +1,8 @@
 from discord.ext.commands import Cog, Bot, Context
+from discord import Message, ButtonStyle, Interaction
+from discord.ui import View, Button
 from discord.ext import commands
-from discord import app_commands, Message
+from discord import app_commands, ui
 
 from bot.spec.config import Config
 
@@ -10,79 +12,137 @@ import time
 
 
 class Console:
-    def __init__(self):
-        self.title = '**Executing the command `{args}`:**'
-        self.footer = '**Return code: `{code}`**'
-        self.content = ''
-        self.args = None
-        self.code = None
-        self.last_call_time = None
+    def __init__(self, *, args: str):
+        self._pattern_title = '**Executing the command `{args}`:**'
+        self._pattern_footer = '**Return code: `{code}`**'
+        self.content: str = ''
+        self.args: str | None = args
+        self.result_code: int | None = None
+        self.current_page: int | None = 1
+        self._last_call_time: float | None = None
 
     @staticmethod
-    def _execute(shell: str) -> typing.Generator:
+    def _execute_with_generator(shell: str) -> typing.Generator:
         popen = subprocess.Popen(shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True,
                                  shell=True)
 
         for stdout_line in iter(popen.stdout.readline, ''):
             yield stdout_line, None
-        if return_code := popen.wait():
-            for stderr_line in iter(popen.stderr.readline, ''):
-                yield stderr_line, None
+        for stderr_line in iter(popen.stderr.readline, ''):
+            yield stderr_line, None
 
         popen.stdout.close()
         popen.stderr.close()
-        yield '', return_code
+        yield '', popen.wait()
 
-    async def run_execution(self, ctx: Context, *, args: str) -> None:
-        self.args = args
-
-        replied_msg: Message = await ctx.reply(self.message, mention_author=False)
-        result_generator = self._execute(self.args)
-
-        for line, code in result_generator:
+    async def send_execution(self, *, msg: Message = None) -> None:
+        for line, code in self._execute_with_generator(self.args):
             string_with_new_line = line.replace('``', "`​`")
 
-            if code is None:
-                self.content += string_with_new_line
-            else:
-                self.code = code
+            self.content += string_with_new_line
+            self.result_code = code
 
-            await self._edit_message_include_cooldown(
-                message=replied_msg, content=self.message, necessarily=self.code is not None)
+            if msg is not None:
+                await self._edit_message_include_cooldown(
+                    message=msg, content=self.full_message, necessarily=self.result_code is not None,
+                    view=PagesView(self))
 
     @property
-    def message(self) -> str:
-        title = f'{self.title.format(args=self.args)}\n' if self.args is not None else ''
-        footer = f'\n{self.footer.format(code=self.code)}' if self.code is not None else ''
+    def title(self) -> str:
+        return f'{self._pattern_title.format(args=self.args)}\n' if self.args is not None else ''
 
-        # len(title) +\n+ len(```) +\n+ ~len(content)~ + len(```) +\n+ len(footer) < 2000
-        accept_length = 2000 - len(title) - len(footer) - 7  # other chars
-        if len(self.content) > accept_length:  # end content have new line
-            accept_length -= 4  # \n...
+    @property
+    def footer(self) -> str:
+        return f'\n{self._pattern_footer.format(code=self.result_code)}' if self.result_code is not None else ''
 
-        cut_content = ''
-        if len(self.content) > accept_length:  # 2542 > 1970
-            for line in self.content.split('\n'):  # cut for lines
-                cut_content += line if not cut_content else f'\n{line}'  # add new line or not
+    @property
+    def accept_length(self) -> int:
+        return 2000 - len(self.title) - len(self.footer) - 8  # other chars
 
-                if len(cut_content) > accept_length:  # stop add lines
-                    cut_content = cut_content[:-len(line)]  # remove last line
-                    break
-            cut_content += '...'
-        elif self.content:  # 456 > 0
-            cut_content = self.content
+    @property
+    def segments_text(self) -> list[str]:
+        segments = ['']
+        for line in self.content.split('\n'):
+            if len(segments[-1]) + len(line) < self.accept_length:
+                segments[-1] += '\n%s' % line
+            else:
+                if not segments[-1]:
+                    segments.pop()
+                for s in range(0, len(line), self.accept_length):
+                    segments.append(line[s:s + self.accept_length])
+        return segments
 
-        return f'{title}```\n{cut_content}\n```{footer}' if cut_content else f'{title[:-1]}{footer}'
+    @property
+    def full_message(self) -> str:
+        if self.small_message:
+            return self.title + self.small_message + self.footer
+        return f'{self.title[:-1]}{self.footer}'
+
+    @property
+    def small_message(self) -> str:
+        if self.cut_content:
+            return f'```\n{self.cut_content}\n```'
+        return ''
+
+    @property
+    def cut_content(self) -> str:
+        if self.content:
+            return self.segments_text[self.current_page - 1]
+        return ''
 
     async def _edit_message_include_cooldown(
-            self, message: Message, *, content: str, necessarily: bool = False) -> Message:
+            self, message: Message, *, content: str, necessarily: bool = False, view: View = None) -> Message:
         cooldown = 0.5
 
-        if (self.last_call_time is None) or (time.time() - self.last_call_time > cooldown) or necessarily:
-            self.last_call_time = time.time()
+        if (self._last_call_time is None) or (time.time() - self._last_call_time > cooldown) or necessarily:
+            self._last_call_time = time.time()
 
-            return await message.edit(content=content)
+            return await message.edit(content=content, view=view)
         return message
+
+
+class PagesView(View):
+    children: list[Button]
+
+    def __init__(self, console: Console):
+        super().__init__()
+        self.console = console
+        self.check_state_buttons()
+
+    def check_state_buttons(self):
+        if self.console.current_page == 1:
+            self.children[0].disabled = True
+        else:
+            self.children[0].disabled = False
+
+        self.children[1].label = '{} / {}'.format(
+            self.console.current_page, len(self.console.segments_text))
+
+        if self.console.current_page == len(self.console.segments_text):
+            self.children[2].disabled = True
+        else:
+            self.children[2].disabled = False
+
+    @ui.button(label='', disabled=True, style=ButtonStyle.gray, emoji='⬅', custom_id='back')
+    async def back_page(self, interaction: Interaction, button: Button):
+
+        if self.console.current_page > 1:  # current_page is not first
+            self.console.current_page -= 1
+
+        self.check_state_buttons()
+        await interaction.response.edit_message(content=self.console.full_message, view=self)
+
+    @ui.button(label='1 / 1', disabled=True, style=ButtonStyle.gray, custom_id='count')
+    async def count_page(self, interaction: Interaction, button: Button): pass
+
+    @ui.button(label='', disabled=False, style=ButtonStyle.gray, emoji='➡', custom_id='next')
+    async def next_page(self, interaction: Interaction, button: Button):
+
+        if self.console.current_page < len(self.console.segments_text):  # current_page is not last
+            self.console.current_page += 1
+
+        self.check_state_buttons()
+        await interaction.response.edit_message(content=self.console.full_message, view=self)
 
 
 class ServerManagement(Cog, name='Server Management', description='Managing the bot\'s command tree',
@@ -108,8 +168,9 @@ class ServerManagement(Cog, name='Server Management', description='Managing the 
     async def _console(self, ctx: Context, *, args: str) -> None:
         await ctx.defer()
 
-        console = Console()
-        await console.run_execution(ctx, args=args)
+        console = Console(args=args)
+        replied_msg: Message = await ctx.reply(console.full_message, mention_author=False)
+        await console.send_execution(msg=replied_msg)
 
 
 async def setup(bot: Bot) -> None:
