@@ -122,33 +122,33 @@ class Loader(Cog, name='Loader', description='Managing extensions and loading co
             if ctx.command.name in ('unload', 'reload'):
                 return set(self.get_extensions()).intersection(bot_extensions)  # Always true
 
-        def check_ext(ext):
-            if ctx.command.name == 'load':
-                return ext not in bot_extensions
-            if ctx.command.name in ('unload', 'reload'):
-                return ext in bot_extensions
-
         def check_dir(folder):
             if ctx.command.name == 'load':
                 return not set(self.get_extensions(folder)).issubset(bot_extensions)
             if ctx.command.name in ('unload', 'reload'):
                 return set(self.get_extensions(folder)).intersection(bot_extensions)
 
-        # Filtering lists
-        if current.lower() in 'all' and check_all():
-            completed.append('all')
+        def check_ext(ext):
+            if ctx.command.name == 'load':
+                return ext not in bot_extensions
+            if ctx.command.name in ('unload', 'reload'):
+                return ext in bot_extensions
 
-        for _extension in self.get_extensions():
-            if not check_ext(_extension):
-                continue
-            if current.lower() in (_small_ext := '.'.join(_extension.split('.')[2:])):
-                filtered_extensions.append(_small_ext)
+        # Filtering lists
+        if current.lower() in '💻 all' and check_all():
+            completed.append('all')
 
         for _folder in os.listdir('./bot/cogs'):
             if not check_dir(_folder):
                 continue
-            if current.lower() in _folder:
+            if current.lower() in '📁 ' + _folder:
                 filtered_directories.append(_folder)
+
+        for _extension in self.get_extensions():
+            if not check_ext(_extension):
+                continue
+            if current.lower() in '🔩 ' + (_small_ext := '.'.join(_extension.split('.')[2:])):
+                filtered_extensions.append(_small_ext)
 
         completed.extend(filtered_directories)
         completed.extend(filtered_extensions)
