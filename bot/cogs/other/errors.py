@@ -1,5 +1,5 @@
 from discord.ext.commands import Cog, Bot, Context
-from discord.ext.commands.errors import CommandNotFound, MissingRequiredArgument
+from discord.ext.commands.errors import CommandNotFound, MissingRequiredArgument, CheckFailure
 
 from bot.spec.config import Config
 
@@ -14,9 +14,11 @@ class ErrorHandler(Cog):
     @Cog.listener()
     async def on_command_error(self, ctx: Context, error: Exception) -> None:
         if isinstance(error, MissingRequiredArgument):
-            return await ctx.send_help(ctx.command)
+            await ctx.send_help(ctx.command)
         elif isinstance(error, CommandNotFound):
-            return await ctx.send_help() if ctx.clean_prefix != Config.CMD_PREFIX else ...
+            await ctx.send_help() if ctx.clean_prefix != Config.CMD_PREFIX else ...
+        elif isinstance(error, CheckFailure):
+            await ctx.reply(error.__str__())
         else:
             traceback.print_exception(type(error), error, error.__traceback__)
 
