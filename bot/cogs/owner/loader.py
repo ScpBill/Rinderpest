@@ -52,6 +52,7 @@ class Loader(Cog, name='Loader', description='Managing extensions and loading co
     @app_commands.describe(extensions='Choose file from the list')
     @commands.is_owner()
     async def _ext_load(self, ctx: Context, *, extensions: str) -> None:
+        await ctx.defer()
         answer = await ctx.reply(self.answer.format('load'), mention_author=False)
 
         for path in self.get_extensions(extensions, cog_name=extensions if '.' in extensions else None):
@@ -73,6 +74,7 @@ class Loader(Cog, name='Loader', description='Managing extensions and loading co
     @app_commands.describe(extensions='Choose file from the list')
     @commands.is_owner()
     async def _ext_unload(self, ctx: Context, *, extensions: str) -> None:
+        await ctx.defer()
         answer = await ctx.reply(self.answer.format('unload'), mention_author=False)
 
         for path in self.get_extensions(extensions, cog_name=extensions if '.' in extensions else None):
@@ -94,6 +96,7 @@ class Loader(Cog, name='Loader', description='Managing extensions and loading co
     @app_commands.describe(extensions='Choose file from the list')
     @commands.is_owner()
     async def _ext_reload(self, ctx: Context, *, extensions: str) -> None:
+        await ctx.defer()
         answer = await ctx.reply(self.answer.format('reload'), mention_author=False)
 
         for path in self.get_extensions(extensions, cog_name=extensions if '.' in extensions else None):
