@@ -9,16 +9,19 @@ import typing
 import time
 
 
-class ServerManagement(Cog, name='Server Management', description='Managing the bot\'s command tree',
-                       command_attrs=dict(hidden=True, guild_ids=[Config.ID_GUILD])):
-
-    def __init__(self, bot: Bot):
-        self.bot = bot
+class Console:
+    def __init__(self):
+        self.title = '**Executing the command `{args}`:**'
+        self.footer = '**Return code: `{code}`**'
+        self.content = ''
+        self.args = None
+        self.code = None
         self.last_call_time = None
 
     @staticmethod
-    def execute(shell: str) -> typing.Generator:
-        popen = subprocess.Popen(shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    def _execute(shell: str) -> typing.Generator:
+        popen = subprocess.Popen(shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True,
+                                 shell=True)
 
         for stdout_line in iter(popen.stdout.readline, ''):
             yield stdout_line, None
@@ -29,6 +32,64 @@ class ServerManagement(Cog, name='Server Management', description='Managing the 
         popen.stdout.close()
         popen.stderr.close()
         yield '', return_code
+
+    async def run_execution(self, ctx: Context, *, args: str) -> None:
+        self.args = args
+
+        replied_msg: Message = await ctx.reply(self.message, mention_author=False)
+        result_generator = self._execute(self.args)
+
+        for line, code in result_generator:
+            string_with_new_line = line.replace('``', "`​`")
+
+            if code is None:
+                self.content += string_with_new_line
+            else:
+                self.code = code
+
+            await self._edit_message_include_cooldown(
+                message=replied_msg, content=self.message, necessarily=self.code is not None)
+
+    @property
+    def message(self) -> str:
+        title = f'{self.title.format(args=self.args)}\n' if self.args is not None else ''
+        footer = f'\n{self.footer.format(code=self.code)}' if self.code is not None else ''
+
+        # len(title) +\n+ len(```) +\n+ ~len(content)~ + len(```) +\n+ len(footer) < 2000
+        accept_length = 2000 - len(title) - len(footer) - 7  # other chars
+        if len(self.content) > accept_length:  # end content have new line
+            accept_length -= 4  # \n...
+
+        cut_content = ''
+        if len(self.content) > accept_length:  # 2542 > 1970
+            for line in self.content.split('\n'):  # cut for lines
+                cut_content += line if not cut_content else f'\n{line}'  # add new line or not
+
+                if len(cut_content) > accept_length:  # stop add lines
+                    cut_content = cut_content[:-len(line)]  # remove last line
+                    break
+            cut_content += '...'
+        elif self.content:  # 456 > 0
+            cut_content = self.content
+
+        return f'{title}```\n{cut_content}\n```{footer}' if cut_content else f'{title[:-1]}{footer}'
+
+    async def _edit_message_include_cooldown(
+            self, message: Message, *, content: str, necessarily: bool = False) -> Message:
+        cooldown = 0.5
+
+        if (self.last_call_time is None) or (time.time() - self.last_call_time > cooldown) or necessarily:
+            self.last_call_time = time.time()
+
+            return await message.edit(content=content)
+        return message
+
+
+class ServerManagement(Cog, name='Server Management', description='Managing the bot\'s command tree',
+                       command_attrs=dict(hidden=True, guild_ids=[Config.ID_GUILD])):
+
+    def __init__(self, bot: Bot):
+        self.bot = bot
 
     @commands.hybrid_command(
         name='update', description='Updating project files using the GitHub repository',
@@ -47,30 +108,8 @@ class ServerManagement(Cog, name='Server Management', description='Managing the 
     async def _console(self, ctx: Context, *, args: str) -> None:
         await ctx.defer()
 
-        content = executing_text = f'**Executing the command `{args}`:**'
-        output_message: Message = await ctx.reply(executing_text, mention_author=False)
-
-        result_generator = self.execute(args)
-        for line, code in result_generator:
-            line, content = line.replace('``', "`​`"), content
-
-            if code is None:
-                if content == executing_text:
-                    content += '\n```\n' + line + '```'
-                else:
-                    content = content[:-3] + line + '```'
-                output_message: Message = await self.edit_message_include_cooldown(output_message, content=content)
-            else:
-                output_message: Message = await output_message.edit(content=content + f'\n**Return code: `{code}`**')
-
-    async def edit_message_include_cooldown(self, message: Message, *, content: str) -> Message:
-        cooldown = 0.5
-
-        if (self.last_call_time is None) or (time.time() - self.last_call_time > cooldown):
-            self.last_call_time = time.time()
-
-            return await message.edit(content=content)
-        return message
+        console = Console()
+        await console.run_execution(ctx, args=args)
 
 
 async def setup(bot: Bot) -> None:
