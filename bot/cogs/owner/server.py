@@ -153,14 +153,33 @@ class ServerManagement(Cog, name='Server Management', description='Managing the 
 
     @commands.hybrid_command(
         name='update', description='Updating project files using the GitHub repository',
-        help='Specify arguments with extreme caution', usage='update [before_invoke] [invoke_commands] [after_invoke]')
-    @app_commands.describe(
-        before_invoke='Commands executed __before__ calling the update, are separated by `;`',
-        after_invoke='Commands executed __after__ calling the update, are separated by `;`'
-    )
+        help='Commands, running applications or packages', usage='update')
     @commands.is_owner()
-    async def _update(self, ctx: Context, *, before_invoke: str = '', after_invoke: str = '') -> None:
+    async def _update(self, ctx: Context) -> None:
         await ctx.defer()
+        answer: Message = await ctx.reply('**Executing update commands:**', mention_author=False)
+
+        console = Console(args='git reset --hard')
+        await console.send_execution()
+        if not console.result_code:
+            answer: Message = await answer.edit(
+                content=answer.content + '\n> `✅` The git *reset* command was executed successfully')
+        else:
+            answer: Message = await answer.edit(
+                content=answer.content + '\n> `❌` The git *reset* command was executed with the code `{}`'
+                                         ''.format(console.result_code))
+
+        console = Console(args='git pull origin master')
+        await console.send_execution()
+        if not console.result_code:
+            answer: Message = await answer.edit(
+                content=answer.content + '\n> `✅` The git *pull* command was executed successfully')
+        else:
+            answer: Message = await answer.edit(
+                content=answer.content + '\n> `❌` The git *pull* command was executed with the code `{}`'
+                                         ''.format(console.result_code))
+
+        await answer.edit(content='**The update was successful**')
 
     @commands.hybrid_command(
         name='console', aliases=['cmd', 'shell'], description='Shell Command Management',
