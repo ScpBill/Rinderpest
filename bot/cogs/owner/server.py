@@ -163,8 +163,10 @@ class ServerManagement(Cog, name='Server Management', description='Managing the 
         await ctx.defer()
 
     @commands.hybrid_command(
-        name='console', aliases=['cmd', 'shell'])
+        name='console', aliases=['cmd', 'shell'], description='Shell Command Management',
+        help='Be extremely careful with specifying arguments', usage='<console|cmd|shell> <args>')
     @commands.is_owner()
+    @app_commands.describe(args='Commands, running applications or packages')
     async def _console(self, ctx: Context, *, args: str) -> None:
         await ctx.defer()
 
