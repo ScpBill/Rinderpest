@@ -9,6 +9,8 @@ from bot.spec.config import Config
 import subprocess
 import typing
 import time
+import sys
+import os
 
 
 class Console:
@@ -192,6 +194,14 @@ class ServerManagement(Cog, name='Server Management', description='Managing the 
         console = Console(args=args)
         replied_msg: Message = await ctx.reply(console.full_message, mention_author=False)
         await console.send_execution(msg=replied_msg)
+
+    @commands.hybrid_command(name='restart', description='Restart the bot', help='Restart the bot', usage='<restart>')
+    @commands.is_owner()
+    async def _restart(self, ctx: Context) -> None:
+        await ctx.defer()
+
+        await ctx.reply('OK, I\'m starting to restart...', mention_author=False)
+        os.execv(sys.executable, ['python'] + sys.argv)
 
 
 async def setup(bot: Bot) -> None:
