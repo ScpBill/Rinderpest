@@ -40,7 +40,8 @@ async def font_style_autocomplete(ctx, current: str) -> [app_commands.Choice[str
     return [style for style in STYLES if current.lower() in style.value]
 
 
-class FeaturesCogs(Cog, name='Features', description='Other user commands'):
+# todo: FontCog
+class FontCog(Cog, name='Features'):
 
     def __init__(self, bot: Bot):
         self.bot = bot
@@ -74,4 +75,4 @@ class FeaturesCogs(Cog, name='Features', description='Other user commands'):
 
 
 async def setup(bot: Bot) -> None:
-    await bot.add_cog(FeaturesCogs(bot))
+    await bot.add_cog(FontCog(bot))
