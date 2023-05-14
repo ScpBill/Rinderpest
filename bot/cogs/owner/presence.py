@@ -1,8 +1,6 @@
-from discord.ext.commands import Bot, Cog, Context
+from discord.ext.commands import Bot, Cog
 from discord.ext.tasks import loop
-from discord.ext import commands
-from discord import Activity, Game
-from pypresence import AioPresence
+from discord import Game
 
 from time import time
 
@@ -33,39 +31,6 @@ class RichPresenceCog(Cog, name='Rich Presence', description='Manage bot\'s and 
         self.bot = bot
         self.start_time = time()
         self.information = self._generator_statuses()
-        self.presence = AioPresence(client_id=self.bot.application_id, loop=self.bot.loop)
-
-    @commands.hybrid_group(name='rp')
-    async def _rich_presence(self, ctx: Context) -> None: pass
-
-    @_rich_presence.command(name='update', description='Change my rich presence')
-    @commands.is_owner()
-    async def _change_presence(
-            self, ctx: Context, state: str = None, details: str = None, start: int = None, end: int = None,
-            large_image: str = None, large_text: str = None, small_image: str = None, small_text: str = None,
-            party_id: str = None, party_size: str = None, join: str = None, spectate: str = None,
-            match: str = None, buttons: str = None, instance: bool = True) -> None:
-
-        await ctx.defer(ephemeral=True)
-        await self.presence.clear()
-
-        try:
-            await self.presence.update(
-                state=state, details=details, start=start, end=end, large_image=large_image, large_text=large_text,
-                small_image=small_image, small_text=small_text, party_id=party_id,
-                party_size=eval(party_size) if party_size is not None else None, join=join,
-                spectate=spectate, match=match, buttons=eval(buttons) if buttons is not None else None, instance=instance
-            )
-        except Exception as exc:
-            await ctx.reply(f'{type(exc).__name__}: {exc}', mention_author=False)
-        else:
-            await ctx.reply('Your status is successful changed!', mention_author=False)
-
-    @_rich_presence.command(name='clear', description='Clear my rich presence')
-    @commands.is_owner()
-    async def _clear_presence(self, ctx: Context) -> None:
-        await ctx.defer(ephemeral=True)
-        await self.presence.clear()
 
     def _generator_statuses(self):
         while True:
@@ -77,7 +42,6 @@ class RichPresenceCog(Cog, name='Rich Presence', description='Manage bot\'s and 
 
     @Cog.listener()
     async def on_ready(self) -> None:
-        await self.presence.connect()
         await self.bot.wait_until_ready()
         print('[+] Rich Presence Cog is started')
 
